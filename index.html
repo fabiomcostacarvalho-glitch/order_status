@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Atendimento - Pedido em Atraso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-yellow-400 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div id="app" class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden fade-in">
+        <div class="bg-slate-900 p-6 text-white text-center">
+            <h1 class="text-yellow-400 font-bold text-xl uppercase tracking-wider">Glovo | Guia de Atendimento</h1>
+            <p class="text-sm opacity-80">Foco: Redução de TMA + Aumento de CSAT</p>
+        </div>
+
+        <div id="step-content" class="p-8">
+            </div>
+
+        <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-xs text-gray-400">
+            <span>Atendemos pessoas. Conectamos experiências.</span>
+            <button onclick="startApp()" class="text-slate-900 font-bold underline">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        const flow = {
+            start: {
+                title: "1. Abertura do Atendimento",
+                text: "Cumprimente de forma objetiva e humanizada. Solicite um momento para análise.",
+                quote: "Vou verificar seu pedido agora e já te retorno com uma atualização, tudo bem?",
+                options: [
+                    { label: "Analisar atraso", next: "identificacao" }
+                ]
+            },
+            identificacao: {
+                title: "2. Identificação do Atraso",
+                text: "Verifique o horário que o chat abriu vs. horário prometido. Calcule o tempo real de atraso.",
+                options: [
+                    { label: "Identificar causa (Loja)", next: "loja" },
+                    { label: "Identificar causa (Estafeta)", next: "estafeta" }
+                ]
+            },
+            loja: {
+                title: "3. Diagnóstico: LOJA",
+                text: "O pedido não foi marcado como pronto? Ligue para a loja imediatamente e atualize o cliente.",
+                options: [
+                    { label: "Verificar complexidade", next: "complexidade" }
+                ]
+            },
+            estafeta: {
+                title: "3. Diagnóstico: ESTAFETA",
+                text: "Sem estafeta? Acionar TL. Com estafeta? Verificar mini mapa + reatribuição.",
+                options: [
+                    { label: "Verificar complexidade", next: "complexidade" }
+                ]
+            },
+            complexidade: {
+                title: "4. Complexidade do Pedido",
+                text: "É um pedido grande (multi-estafeta) ou há mais de um pedido ativo?",
+                options: [
+                    { label: "Cliente quer cancelar", next: "cancelamento" },
+                    { label: "Seguir para solução/compensação", next: "compensacao" }
+                ]
+            },
+            cancelamento: {
+                title: "5. Cancelamento",
+                text: "Atraso > 40 min? Orientar cancelamento via App. Se o cliente recusar, simule e informe custos.",
+                options: [
+                    { label: "Cliente decidiu continuar", next: "compensacao" },
+                    { label: "Finalizar atendimento", next: "final" }
+                ]
+            },
+            compensacao: {
+                title: "7. Compensação",
+                text: "Verifique se há compensação disponível no sistema ou se já foi aplicada automaticamente.",
+                options: [
+                    { label: "Aplicar e Finalizar", next: "final" }
+                ]
+            },
+            final: {
+                title: "8. Foco Final",
+                text: "Diagnóstico rápido, escuta ativa e validação emocional. Lembre-se: Resolver CERTO e RÁPIDO!",
+                options: [
+                    { label: "Novo Atendimento", next: "start" }
+                ]
+            }
+        };
+
+        function renderStep(stepKey) {
+            const step = flow[stepKey];
+            const container = document.getElementById('step-content');
+            
+            let html = `
+                <div class="fade-in">
+                    <h2 class="text-2xl font-black text-slate-900 mb-4">${step.title}</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">${step.text}</p>
+            `;
+
+            if (step.quote) {
+                html += `<div class="border-l-4 border-yellow-400 pl-4 italic text-gray-500 mb-6">"${step.quote}"</div>`;
+            }
+
+            html += `<div class="space-y-3">`;
+            
+            step.options.forEach(opt => {
+                html += `
+                    <button onclick="renderStep('${opt.next}')" 
+                            class="w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center group">
+                        ${opt.label}
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </button>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function startApp() {
+            renderStep('start');
+        }
+
+        startApp();
+    </script>
+</body>
+</html>
