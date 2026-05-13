@@ -3,219 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo | Guia Interativo</title>
+    <title>Glovo Guia Interativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .btn-choice { @apply w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center mb-3; }
-        .btn-sub { @apply w-full bg-slate-100 text-slate-800 font-bold py-3 px-4 rounded-xl hover:bg-slate-200 transition-all mb-2 text-sm text-left; }
-    </style>
 </head>
 <body class="bg-yellow-400 min-h-screen flex items-center justify-center p-4 font-sans text-slate-900">
 
-    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden fade-in">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden">
         <div class="bg-slate-900 p-6 text-white text-center">
             <h1 class="text-yellow-400 font-black text-xl uppercase italic">Glovo Support Guide</h1>
-            <p class="text-[10px] opacity-70 font-bold uppercase tracking-widest mt-1">Foco: Redução de TMA + Aumento de CSAT</p>
+            <p class="text-[10px] opacity-70 font-bold uppercase tracking-widest mt-1">Redução de TMA + CSAT</p>
         </div>
 
         <div id="cancel-bar" class="bg-red-50 p-3 border-b border-red-100 hidden flex items-center justify-between px-8">
-            <span class="text-red-700 font-black text-[10px] uppercase">Cliente pediu cancelamento?</span>
-            <input type="checkbox" id="cancelToggle" onchange="checkCancel()" class="w-5 h-5 accent-red-600">
+            <span class="text-red-700 font-black text-[10px] uppercase">O cliente quer cancelar?</span>
+            <input type="checkbox" id="cancelToggle" onchange="checkCancelStatus()" class="w-5 h-5 accent-red-600">
         </div>
 
-        <div id="main-content" class="p-8 min-h-[450px]">
-            </div>
+        <div id="main-content" class="p-8 min-h-[400px]">
+            <div class="text-center text-gray-400 py-20">Carregando guia...</div>
+        </div>
 
         <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-[10px] font-bold text-gray-400">
-            <span>ATENDEMOS PESSOAS. CONECTAMOS EXPERIÊNCIAS.</span>
+            <span>RESOLVER CERTO E RÁPIDO</span>
             <button onclick="location.reload()" class="text-slate-900 underline uppercase">Reiniciar</button>
         </div>
     </div>
 
     <script>
         let atrasoGlobal = 0;
-        let lastFunction = "step1";
+        let lastStep = "step1";
 
-        const content = document.getElementById('main-content');
-        const cancelBar = document.getElementById('cancel-bar');
-
+        // Função para garantir que o conteúdo muda
         function render(html) {
-            content.innerHTML = `<div class="fade-in">${html}</div>`;
+            const container = document.getElementById('main-content');
+            container.innerHTML = html;
         }
 
-        // --- PASSO 1: TEMPO ---
+        // --- PASSO 1 ---
         function step1() {
-            lastFunction = "step1";
-            cancelBar.classList.add('hidden');
+            lastStep = "step1";
+            document.getElementById('cancel-bar').classList.add('hidden');
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase">1. Início do Atendimento</h2>
-                <div class="bg-slate-50 p-4 rounded-xl border-l-4 border-yellow-400 mb-6 italic text-gray-500 text-sm">
-                    "Vou verificar seu pedido agora e já te retorno..."
-                </div>
+                <h2 class="text-xl font-black mb-4 uppercase">1. Calcular Atraso</h2>
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase">ETA Previsto</label>
-                        <input type="time" id="eta" class="w-full p-3 border rounded-xl font-bold">
+                        <input type="time" id="eta" class="w-full p-3 border rounded-xl font-bold bg-gray-50">
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase">Hora Atual</label>
-                        <input type="time" id="now" class="w-full p-3 border rounded-xl font-bold">
+                        <input type="time" id="now" class="w-full p-3 border rounded-xl font-bold bg-gray-50">
                     </div>
                 </div>
-                <button onclick="calculate()" class="btn-choice !bg-yellow-400 !text-slate-900 uppercase italic">Analisar Atraso →</button>
+                <button onclick="calcAtraso()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-md uppercase">Analisar Pedido</button>
             `);
         }
 
-        function calculate() {
+        function calcAtraso() {
             const t1 = document.getElementById('eta').value;
             const t2 = document.getElementById('now').value;
             if(!t1 || !t2) return alert("Insira as horas!");
+            
             const [h1, m1] = t1.split(':').map(Number);
             const [h2, m2] = t2.split(':').map(Number);
             atrasoGlobal = (h2 * 60 + m2) - (h1 * 60 + m1);
-            cancelBar.classList.remove('hidden');
+            
+            document.getElementById('cancel-bar').classList.remove('hidden');
             step2();
         }
 
-        // --- PASSO 2: MODELO ---
+        // --- PASSO 2 ---
         function step2() {
-            lastFunction = "step2";
-            const comp = atrasoGlobal >= 15 ? 
-                `<div class="bg-green-50 text-green-700 p-2 rounded text-[10px] font-bold mb-4 italic text-center underline">Atraso de ${atrasoGlobal}min: Compensação disponível</div>` :
-                `<div class="bg-gray-50 text-gray-500 p-2 rounded text-[10px] font-bold mb-4 text-center italic">Atraso de ${atrasoGlobal}min: Sem compensação</div>`;
-            
+            lastStep = "step2";
+            const compText = atrasoGlobal >= 15 ? 
+                `<div class="bg-green-100 text-green-700 p-2 rounded text-[10px] font-bold mb-4 text-center">Atraso de ${atrasoGlobal}min: Elegível para Compensação</div>` :
+                `<div class="bg-gray-100 text-gray-500 p-2 rounded text-[10px] font-bold mb-4 text-center">Atraso de ${atrasoGlobal}min: Sem Compensação</div>`;
+
             render(`
-                <h2 class="text-xl font-black mb-2 uppercase italic">2. Identificação</h2>
-                ${comp}
-                <p class="text-sm font-bold text-slate-400 mb-6 uppercase">Modelo de Entrega:</p>
-                <button onclick="stepVendor()" class="btn-choice">Vendor Delivery (Loja)<span>→</span></button>
-                <button onclick="stepPlatform()" class="btn-choice">Platform Delivery (Glovo)<span>→</span></button>
+                ${compText}
+                <h2 class="text-xl font-black mb-4 uppercase italic">2. Tipo de Entrega</h2>
+                <button onclick="stepVendor()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl mb-3">Vendor Delivery (Loja)</button>
+                <button onclick="stepPlatform()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl">Platform Delivery (Glovo)</button>
             `);
         }
 
-        // --- VENDOR ---
-        function stepVendor() {
-            lastFunction = "stepVendor";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">Diagnóstico: Loja</h2>
-                <div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-200 mb-6 text-orange-900 text-sm font-medium">
-                    O suporte não tem visibilidade do estafeta. <b>Contacte a loja imediatamente.</b>
-                </div>
-                <button onclick="stepComplexidade()" class="btn-choice">Seguir Fluxo<span>→</span></button>
-            `);
-        }
-
-        // --- PLATFORM / STATUS LOJA ---
+        // --- PLATFORM ---
         function stepPlatform() {
-            lastFunction = "stepPlatform";
+            lastStep = "stepPlatform";
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-center">3. Status do Pedido</h2>
-                <p class="text-sm font-bold text-slate-500 mb-6 italic text-center leading-tight">O pedido foi marcado como "PRONTO" na App?</p>
+                <h2 class="text-xl font-black mb-4 uppercase italic">3. Status do Pedido</h2>
+                <p class="text-sm font-bold mb-6 text-gray-500">O pedido foi marcado como "PRONTO" na App?</p>
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepAssign()" class="btn-choice !justify-center">Sim</button>
-                    <button onclick="stepLigarLoja()" class="btn-choice !justify-center">Não</button>
+                    <button onclick="stepEstafeta()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
+                    <button onclick="stepLigarLoja()" class="bg-slate-100 text-slate-900 font-bold py-4 rounded-xl border">NÃO</button>
                 </div>
             `);
         }
 
         function stepLigarLoja() {
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-center">Ligar para a Loja</h2>
-                <button onclick="stepLojaNaoAtende()" class="btn-sub">1. A Loja não atendeu</button>
-                <button onclick="stepLojaPronto()" class="btn-sub">2. Atendeu e pedido está PRONTO</button>
-                <button onclick="stepLojaNaoPrepara()" class="btn-sub">3. Atendeu e NÃO vai preparar</button>
+                <h2 class="text-xl font-black mb-4 uppercase italic">Ligar para a Loja</h2>
+                <button onclick="render('<p class=\'p-4 bg-blue-50 text-sm font-bold\'>Validar horário. Se aberta, continuar.</p><button onclick=\'stepEstafeta()\' class=\'mt-4 w-full bg-slate-900 text-white py-3 rounded-xl\'>Seguir</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">1. Loja não atendeu</button>
+                <button onclick="lojaPronto()" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">2. Atendeu e pedido Pronto</button>
+                <button onclick="lojaNaoPrepara()" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">3. Atendeu e NÃO vai preparar</button>
             `);
         }
 
-        function stepLojaNaoAtende() {
-            render(`<div class="bg-blue-50 p-4 rounded-xl text-xs font-bold mb-4">Validar horário. Se aberta, continuar fluxo.</div><button onclick="stepAssign()" class="btn-choice">Seguir<span>→</span></button>`);
+        function lojaPronto() {
+            render(`
+                <div class="bg-green-50 p-4 rounded-xl text-xs font-bold text-green-800 mb-4 border-l-4 border-green-500">
+                    "Informar ao cliente que a loja já preparou e a App deve atualizar a qualquer momento."
+                </div>
+                <button onclick="stepEstafeta()" class="w-full bg-slate-900 text-white py-3 rounded-xl">Continuar</button>
+            `);
         }
 
-        function stepLojaPronto() {
-            render(`<div class="bg-green-50 p-4 rounded-xl text-xs font-bold text-green-800 mb-4 italic">"Informar cliente que a loja já preparou e a App deve atualizar em breve."</div><button onclick="stepAssign()" class="btn-choice">Continuar<span>→</span></button>`);
-        }
-
-        function stepLojaNaoPrepara() {
+        function lojaNaoPrepara() {
             render(`
                 <div class="bg-red-50 p-6 rounded-xl border-2 border-red-200">
                     <h4 class="font-black text-red-600 uppercase mb-2">Cancelamento: Too Busy</h4>
-                    <p class="text-xs italic leading-relaxed text-red-900">"Infelizmente ao contactar a loja verificamos que a mesma não tem condições para preparar... já cancelamos sem custos + compensação!"</p>
+                    <p class="text-xs italic leading-relaxed text-red-900">"Infelizmente a loja não tem condições para preparar... já cancelamos sem custos + compensação!"</p>
                 </div>
             `);
         }
 
-        // --- ESTAFETA / REATRIBUIÇÃO ---
-        function stepAssign() {
-            lastFunction = "stepAssign";
+        function stepEstafeta() {
+            lastStep = "stepEstafeta";
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-center">4. Estafeta</h2>
-                <p class="text-sm font-bold text-slate-500 mb-6 text-center">Existe estafeta atribuído?</p>
+                <h2 class="text-xl font-black mb-4 uppercase italic">4. Estafeta</h2>
+                <p class="text-sm font-bold mb-6 text-gray-500">Existe estafeta atribuído?</p>
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepRiderComportamento()" class="btn-choice !justify-center">Sim</button>
-                    <button onclick="render('<p class=\'bg-red-600 text-white p-6 rounded-xl font-black text-center\'>CONSULTAR LEADERSHIP</p>')" class="btn-choice !justify-center">Não</button>
+                    <button onclick="stepRiderMove()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
+                    <button onclick="render('<p class=\'bg-red-600 text-white p-6 rounded-xl font-bold text-center uppercase\'>Consultar Leadership</p>')" class="bg-slate-900 text-white font-bold py-4 rounded-xl">NÃO</button>
                 </div>
             `);
         }
 
-        function stepRiderComportamento() {
-            lastFunction = "stepRiderComportamento";
+        function stepRiderMove() {
+            lastStep = "stepRiderMove";
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-center">Comportamento</h2>
-                <p class="text-sm font-bold text-slate-500 mb-6 text-center">Rider parado ou na direção errada?</p>
+                <h2 class="text-xl font-black mb-4 uppercase italic">Comportamento</h2>
+                <p class="text-sm font-bold mb-6 text-gray-500">Estafeta parado ou direcção errada?</p>
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepReatribuicaoCheck()" class="btn-choice !justify-center">Sim</button>
-                    <button onclick="stepComplexidade()" class="btn-choice !justify-center">Não</button>
+                    <button onclick="stepReatribuir()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
+                    <button onclick="stepComplexidade()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">NÃO</button>
                 </div>
             `);
         }
 
-        function stepReatribuicaoCheck() {
+        function stepReatribuir() {
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">Validar Reatribuição</h2>
-                <ul class="text-[10px] font-black uppercase text-slate-400 space-y-2 mb-6 border-l-2 pl-4">
-                    <li>• Pedido está PRONTO</li>
-                    <li>• Rider aceitou há 20min+</li>
-                    <li>• Estafeta assignado</li>
-                    <li>• NÃO é stacked order</li>
-                </ul>
-                <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-black text-center\'>REATRIBUIR E INFORMAR CLIENTE</p>')" class="btn-choice !bg-green-600">Cumpre tudo (Sim)</button>
-                <button onclick="stepComplexidade()" class="btn-choice !bg-slate-400">Algum é Não</button>
+                <h2 class="text-xl font-black mb-4 uppercase italic text-red-600">Reatribuição</h2>
+                <div class="text-[10px] font-bold mb-6 space-y-1 opacity-70">
+                    <p>• Pedido Pronto / • Rider aceitou há 20min+</p>
+                    <p>• Rider parado ou direção errada / • NÃO é stacked</p>
+                </div>
+                <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-bold text-center uppercase\'>Reatribuir e informar cliente</p>')" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl mb-2">Cumpre Tudo (Sim)</button>
+                <button onclick="stepComplexidade()" class="w-full bg-slate-400 text-white font-bold py-4 rounded-xl">Algum é Não</button>
             `);
         }
 
-        // --- COMPLEXIDADE ---
         function stepComplexidade() {
-            lastFunction = "stepComplexidade";
+            lastStep = "stepComplexidade";
             render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-center">4. Complexidade</h2>
-                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs italic mb-4\'>Informar cliente: Entrega por mais de um estafeta (Pedido Grande).</div><button onclick=\'stepComplexidade()\' class=\'btn-choice\'>Voltar</button>')" class="btn-choice">É um pedido GRANDE?</button>
-                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs italic mb-4\'>Informar cliente: Rider termina entrega na área e segue para si (Stacked).</div><button onclick=\'stepComplexidade()\' class=\'btn-choice\'>Voltar</button>')" class="btn-choice">É um pedido STACKED?</button>
-                <button onclick="render('<h2 class=\'text-center font-black\'>Seguir Tratativa 6, 7 e 8</h2>')" class="btn-choice !bg-slate-400 !justify-center">Nenhum destes</button>
+                <h2 class="text-xl font-black mb-4 uppercase italic">4. Complexidade</h2>
+                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs font-bold mb-4 border-l-4 border-blue-400\'>Script: Pedido entregue por mais de um estafeta (Pedido Grande).</div><button onclick=\'stepComplexidade()\' class=\'w-full border p-2\'>Voltar</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold">É um pedido GRANDE?</button>
+                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs font-bold mb-4 border-l-4 border-blue-400\'>Script: Rider termina entrega na área e segue para si (Stacked).</div><button onclick=\'stepComplexidade()\' class=\'w-full border p-2\'>Voltar</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold">É um pedido STACKED?</button>
+                <button onclick="render('<h2 class=\'text-center font-black py-10\'>Finalizar: Seções 6, 7 e 8</h2>')" class="w-full bg-slate-400 text-white font-bold py-4 rounded-xl">Nenhum</button>
             `);
         }
 
-        // --- LÓGICA DE CANCELAMENTO ---
-        function checkCancel() {
+        function stepVendor() {
+            lastStep = "stepVendor";
+            render(`
+                <h2 class="text-xl font-black mb-4 uppercase italic">Diagnóstico Loja</h2>
+                <div class="bg-orange-50 p-6 rounded-xl border-l-4 border-orange-400 mb-6 font-bold text-sm">
+                    Vendor Delivery: Contactar a loja imediatamente.
+                </div>
+                <button onclick="stepComplexidade()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl">Seguir</button>
+            `);
+        }
+
+        // --- CANCELAMENTO ---
+        function checkCancelStatus() {
             const isChecked = document.getElementById('cancelToggle').checked;
             if (isChecked) {
                 if (atrasoGlobal < 40) {
                     render(`
                         <div class="bg-red-50 p-6 rounded-2xl border-2 border-red-200 text-center">
-                            <h3 class="text-red-600 font-black text-xl mb-2">Cancelamento Indisponível</h3>
-                            <p class="text-sm font-bold text-red-900 italic">Atraso atual: ${atrasoGlobal} min.</p>
-                            <p class="text-[10px] mt-6 text-slate-400 uppercase font-black">Necessário ≥ 40 min para cancelamento gratuito.</p>
+                            <h3 class="text-red-600 font-black text-xl mb-2 italic tracking-tighter">Cancelamento Indisponível</h3>
+                            <p class="text-xs font-bold text-red-900 italic">Atraso atual: ${atrasoGlobal} minutos.</p>
+                            <p class="text-[10px] mt-6 text-slate-400 font-black uppercase">Mínimo necessário: 40 minutos</p>
                         </div>
                     `);
                 } else {
                     render(`
                         <h2 class="text-xl font-black text-red-600 mb-4 uppercase italic">Validação Gratuita</h2>
-                        <div class="space-y-2 text-[10px] font-black uppercase text-slate-500 mb-6">
-                            <p>1. Atraso ≥ 40 min? <span class="text-green-600 font-bold">✓</span></p>
-                            <p>2. NÃO é stacked order?</p>
-                            <p>3. Pick-up aconteceu há 25min+?</p>
-                            <p>4. Rider no pick-up há 10min+?</p>
-                            <p>5. Rider NÃO pediu ajuda?</p>
+                        <div class="text-[10px] font-bold space-y-2 mb-6 opacity-60">
+                            <p>1. Atraso ≥ 40 min? ✓</p>
+                            <p>2. NÃO é stacked? / 3. Pick-up há 25min+?</p>
+                            <p>4. Rider no pick-up há 10min+? / 5. Rider NÃO pediu ajuda?</p>
                         </div>
-                        <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-black text-center uppercase\'>Oferecer Cancelamento Gratuito</p>')" class="btn-choice
+                        <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-bold text-center\'>Oferecer Cancelamento Gratuito</p>')" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl mb-2">Elegível (Tudo Sim)</button>
+                        <button onclick="stepComplexidade()" class="w-full bg-red-800 text-white font-bold py-4 rounded-xl">Não Elegível</button>
+                    `);
+                }
+            } else {
+                // Volta para o último passo guardado
+                window[lastStep]();
+            }
+        }
+
+        // Inicia assim que o DOM carregar
+        document.addEventListener('DOMContentLoaded', step1);
+    </script>
+</body>
+</html>
