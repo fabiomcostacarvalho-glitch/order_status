@@ -1,131 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPO Hub - Calculadora & Guia Glovo</title>
+    <title>Glovo | Guia de Atendimento Interativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .btn-choice { @apply flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl transition-all border-2 border-transparent; }
-        .btn-main { @apply w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-all mb-2 shadow-sm; }
-        input[type="checkbox"] { @apply w-5 h-5 accent-red-600 cursor-pointer; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-choice { @apply w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center group mb-3; }
+        .btn-cancel { @apply w-full bg-red-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-red-700 transition-all mb-4 flex justify-center items-center gap-2; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 font-sans text-slate-900">
+<body class="bg-yellow-400 min-h-screen flex items-center justify-center p-4 font-sans">
 
-    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden self-start">
-            <div class="bg-slate-800 p-4 text-white">
-                <h2 class="font-bold uppercase text-sm tracking-widest">Calculadora B/M</h2>
-            </div>
-            <div class="p-6 space-y-3">
-                <div class="bg-blue-50 p-3 rounded-lg text-xs">
-                    <label class="block font-bold mb-1 italic">Considerar Produtividade?</label>
-                    <select id="includeProd" class="w-full p-2 border rounded" onchange="calculateBM()">
-                        <option value="yes">Sim</option>
-                        <option value="no">Não (Distribuir 5% pelos outros)</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-3 text-xs">
-                    <div><label>Csat %</label><input type="number" id="csat" class="w-full p-2 border rounded" oninput="calculateBM()"></div>
-                    <div><label>Rsat %</label><input type="number" id="rsat" class="w-full p-2 border rounded" oninput="calculateBM()"></div>
-                    <div><label>Vsat %</label><input type="number" id="vsat" class="w-full p-2 border rounded" oninput="calculateBM()"></div>
-                    <div><label>Comp %</label><input type="number" id="comp" class="w-full p-2 border rounded" oninput="calculateBM()"></div>
-                </div>
-                <div id="prodContainer">
-                    <label class="text-xs">Produtividade (Score)</label>
-                    <input type="number" id="prod" class="w-full p-2 border rounded text-xs" oninput="calculateBM()">
-                </div>
-                <div class="mt-4 p-4 bg-slate-900 text-white rounded-xl text-center">
-                    <span class="text-[10px] uppercase opacity-60">Bónus/Malus Final</span>
-                    <div id="resultBM" class="text-2xl font-black">0.00%</div>
-                </div>
-            </div>
+    <div id="app" class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden fade-in">
+        <div class="bg-slate-900 p-6 text-white text-center relative">
+            <h1 class="text-yellow-400 font-bold text-xl uppercase tracking-wider">Glovo | Guia de Atendimento</h1>
+            <p class="text-sm opacity-80 italic">Foco: Redução de TMA + Aumento de CSAT</p>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-8 border-yellow-400">
-            <div id="flowHeader" class="bg-yellow-400 p-5">
-                <div class="flex justify-between items-center">
-                    <h2 class="font-black italic uppercase text-lg">Guia Atendimento</h2>
-                    <button onclick="resetFlow()" class="bg-black text-white text-[10px] px-3 py-1 rounded-full font-bold">RESET</button>
-                </div>
-                <div class="mt-4 bg-black/10 p-2 rounded-lg flex items-center justify-between">
-                    <span class="text-[10px] font-black uppercase">Cliente pediu cancelamento?</span>
-                    <input type="checkbox" id="cancelToggle" onchange="handleCancelToggle()">
-                </div>
+        <div id="cancel-zone" class="bg-red-50 p-4 border-b border-red-100 hidden">
+            <label class="flex items-center justify-center gap-3 cursor-pointer">
+                <input type="checkbox" id="cancelTrigger" class="w-5 h-5 accent-red-600" onchange="toggleCancelFlow()">
+                <span class="text-red-700 font-bold text-sm uppercase">O cliente pediu o cancelamento?</span>
+            </label>
+        </div>
+
+        <div id="step-content" class="p-8 min-h-[400px]">
             </div>
 
-            <div id="flowContent" class="p-6 min-h-[450px]">
-                </div>
+        <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-xs text-gray-400">
+            <span>Atendemos pessoas. Conectamos experiências.</span>
+            <button onclick="startApp()" class="text-slate-900 font-bold underline">Reiniciar</button>
         </div>
     </div>
 
     <script>
-        // --- LÓGICA CALCULADORA B/M ---
-        function calculateBM() {
-            const inc = document.getElementById('includeProd').value === 'yes';
-            document.getElementById('prodContainer').style.opacity = inc ? '1' : '0.3';
-            let w = { csat: 0.30, rsat: 0.25, vsat: 0.25, comp: 0.15, prod: 0.05 };
-            if (!inc) {
-                const add = 0.05 / 4;
-                w.csat += add; w.rsat += add; w.vsat += add; w.comp += add; w.prod = 0;
-            }
-            const getI = (v, t) => {
-                if (isNaN(v)) return 0;
-                if (v < t[0]) return -0.05; if (v <= t[1]) return -0.02;
-                if (v <= t[2]) return 0; if (v <= t[3]) return 0.02; return 0.05;
-            };
-            const scores = {
-                csat: getI(parseFloat(document.getElementById('csat').value), [73, 75.9, 79.9, 82]),
-                rsat: getI(parseFloat(document.getElementById('rsat').value), [77, 79.9, 82.9, 85]),
-                vsat: getI(parseFloat(document.getElementById('vsat').value), [83, 84.9, 86.9, 88]),
-                comp: getI(parseFloat(document.getElementById('comp').value), [93, 94.9, 95.9, 97]),
-                prod: getI(parseFloat(document.getElementById('prod').value), [7.6, 8.7, 8.8, 9.9])
-            };
-            let total = (scores.csat*w.csat + scores.rsat*w.rsat + scores.vsat*w.vsat + scores.comp*w.comp + scores.prod*w.prod) * 100;
-            const resEl = document.getElementById('resultBM');
-            resEl.innerText = (total > 0 ? "+" : "") + total.toFixed(2) + "%";
-            resEl.className = total > 0 ? "text-2xl font-black text-green-500" : (total < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-white");
+        let state = {
+            atrasoMinutos: 0,
+            isPlatform: false,
+            currentStep: 'start'
+        };
+
+        function render(html) {
+            document.getElementById('step-content').innerHTML = `<div class="fade-in">${html}</div>`;
         }
 
-        // --- LÓGICA GUIA GLOVO ---
-        let flowState = { atraso: 0, cancelRequested: false, lastStep: 'step1' };
+        // --- INÍCIO ---
+        function startApp() {
+            state.atrasoMinutos = 0;
+            state.currentStep = 'start';
+            document.getElementById('cancel-zone').classList.add('hidden');
+            document.getElementById('cancelTrigger').checked = false;
+            
+            render(`
+                <h2 class="text-2xl font-black text-slate-900 mb-4">1. Abertura do Atendimento</h2>
+                <p class="text-gray-600 mb-6 leading-relaxed">Cumprimente de forma objetiva e humanizada. Solicite um momento para análise.</p>
+                <div class="border-l-4 border-yellow-400 pl-4 italic text-gray-500 mb-8">"Vou verificar seu pedido agora e já te retorno com uma atualização, tudo bem?"</div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">ETA Previsto</label>
+                        <input type="time" id="eta" class="w-full p-3 border rounded-xl bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Hora Actual</label>
+                        <input type="time" id="now" class="w-full p-3 border rounded-xl bg-gray-50">
+                    </div>
+                </div>
 
-        function renderFlow(html) {
-            document.getElementById('flowContent').innerHTML = `<div class="fade-in">${html}</div>`;
+                <button onclick="handleAtraso()" class="btn-choice">
+                    Analisar Atraso <span>→</span>
+                </button>
+            `);
         }
 
-        function resetFlow() {
-            flowState = { atraso: 0, cancelRequested: false, lastStep: 'step1' };
-            document.getElementById('cancelToggle').checked = false;
-            step1();
+        function handleAtraso() {
+            const t1 = document.getElementById('eta').value;
+            const t2 = document.getElementById('now').value;
+            if(!t1 || !t2) return alert("Por favor, preencha as horas.");
+
+            const [h1, m1] = t1.split(':').map(Number);
+            const [h2, m2] = t2.split(':').map(Number);
+            state.atrasoMinutos = (h2 * 60 + m2) - (h1 * 60 + m1);
+
+            document.getElementById('cancel-zone').classList.remove('hidden');
+            stepIdentificacao();
         }
 
-        function handleCancelToggle() {
-            flowState.cancelRequested = document.getElementById('cancelToggle').checked;
-            if (flowState.cancelRequested) {
-                if (flowState.atraso < 40) {
-                    renderFlow(`
-                        <div class="bg-red-50 p-6 rounded-2xl border-2 border-red-200 text-center">
-                            <h3 class="text-red-600 font-black text-lg mb-2">CANCELAMENTO NEGADO</h3>
-                            <p class="text-sm">Atraso atual: <b>${flowState.atraso} min</b>.</p>
-                            <p class="text-xs mt-4">Para cancelamento gratuito é necessário <b>atraso ≥ 40min</b>. Continue o suporte para reduzir o TMA.</p>
-                        </div>
-                    `);
-                } else {
-                    stepCancelChecklist();
-                }
-            } else {
-                window[flowState.lastStep]();
-            }
+        // --- IDENTIFICAÇÃO ---
+        function stepIdentificacao() {
+            state.currentStep = 'identificacao';
+            const compMsg = state.atrasoMinutos >= 15 
+                ? `<div class="bg-green-100 text-green-700 p-3 rounded-lg text-xs font-bold mb-4 italic">✓ Atraso de ${state.atrasoMinutos}min: Compensação disponível.</div>`
+                : `<div class="bg-slate-100 text-slate-500 p-3 rounded-lg text-xs font-bold mb-4 italic">Atraso de ${state.atrasoMinutos}min: Sem compensação.</div>`;
+
+            render(`
+                <h2 class="text-2xl font-black text-slate-900 mb-2">2. Identificação</h2>
+                ${compMsg}
+                <p class="text-gray-600 mb-6">Qual o modelo de entrega deste pedido?</p>
+                
+                <button onclick="stepVendor()" class="btn-choice">Vendor Delivery (Loja) <span>→</span></button>
+                <button onclick="state.isPlatform=true; stepPlatform()" class="btn-choice">Platform Delivery (Glovo) <span>→</span></button>
+            `);
         }
 
-        function step1() {
-            flowState.lastStep = 'step1';
-            renderFlow(`
-                <h3 class="font-bold mb-4">1. Identificar Atraso</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div><label class="text-[10px] font-bold">ETA PREVISTO</label><input type="time" id="eta" class="w-full
+        // --- VENDOR ---
+        function stepVendor() {
+            state.currentStep = 'vendor';
+            render(`
+                <h2 class="text-2xl font-black text-slate-900 mb-4">3. Diagnóstico: LOJA</h2>
+                <div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
+                    <p class="text-orange-800 font-bold mb-2 uppercase text-sm">Ação Obrigatória:</p>
+                    <p class="text-orange-900">O suporte não tem visibilidade do estafeta. <b>Ligue para a loja imediatamente</b> para obter atualização.</p>
+                </div>
+                <button onclick="stepComplexidade()" class="btn-choice">Avançar para Complexidade <span>→</span></button>
+            `);
+        }
+
+        // --- PLATFORM ---
+        function stepPlatform() {
+            state.currentStep = 'platform';
+            render(`
+                <h2 class="text-2xl font-black text-slate-900 mb-4">3. Status do Pedido</h2>
+                <p class="text-gray-600 mb-6 font-medium italic">O pedido foi marcado como "PRONTO" na App?</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="stepEstafetaAssign()" class="btn-choice !justify-center">Sim</button>
+                    <button onclick="stepLigarLoja()" class="btn-choice !justify-center">Não</button>
+                </div>
+            `);
+        }
