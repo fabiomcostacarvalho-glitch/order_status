@@ -3,219 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Guia Interativo</title>
+    <title>Glovo Expert Helper</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .btn-nav { @apply w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center mb-3 shadow-sm; }
+        .btn-back { @apply flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase hover:text-slate-900 transition-colors mb-4; }
+    </style>
 </head>
-<body class="bg-yellow-400 min-h-screen flex items-center justify-center p-4 font-sans text-slate-900">
+<body class="bg-yellow-400 min-h-screen p-4 font-sans text-slate-900">
 
-    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden">
-        <div class="bg-slate-900 p-6 text-white text-center">
-            <h1 class="text-yellow-400 font-black text-xl uppercase italic">Glovo Support Guide</h1>
-            <p class="text-[10px] opacity-70 font-bold uppercase tracking-widest mt-1">Redução de TMA + CSAT</p>
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-4 mt-4">
+        
+        <div class="flex-1 bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-slate-900 p-6 text-white">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-yellow-400 font-black text-xl italic uppercase leading-none">Glovo Support</h1>
+                    <span id="progress-text" class="text-[10px] font-bold opacity-60 uppercase">Passo 1 de 5</span>
+                </div>
+                <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-500" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <div id="steps-container" class="p-8 flex-1 min-h-[450px]">
+                
+                <div id="step1" class="step active">
+                    <h2 class="text-xl font-black mb-4 uppercase">1. Início e Cálculo</h2>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase">ETA Previsto</label>
+                            <input type="time" id="eta" class="w-full p-3 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold focus:border-yellow-400 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase">Hora Atual</label>
+                            <input type="time" id="now" class="w-full p-3 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold focus:border-yellow-400 outline-none">
+                        </div>
+                    </div>
+                    <button onclick="submitStep1()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-lg hover:scale-[1.01] transition-transform uppercase italic">Analisar Atraso →</button>
+                </div>
+
+                <div id="step2" class="step">
+                    <button onclick="prevStep(1)" class="btn-back">← Voltar para tempo</button>
+                    <h2 class="text-xl font-black mb-6 uppercase">2. Tipo de Entrega</h2>
+                    <button onclick="submitStep2('Vendor Delivery')" class="btn-nav">Vendor Delivery (Loja) <span>→</span></button>
+                    <button onclick="submitStep2('Platform Delivery')" class="btn-nav">Platform Delivery (Glovo) <span>→</span></button>
+                </div>
+
+                <div id="step3" class="step">
+                    <button onclick="prevStep(2)" class="btn-back">← Voltar para modelo</button>
+                    <h2 class="text-xl font-black mb-4 uppercase">3. Status do Pedido</h2>
+                    <p class="text-sm text-gray-500 mb-6 font-bold italic">O pedido foi marcado como PRONTO?</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="submitStep3('Sim')" class="btn-nav !justify-center">SIM</button>
+                        <button onclick="submitStep3('Não')" class="btn-nav !justify-center">NÃO</button>
+                    </div>
+                </div>
+
+                <div id="step4" class="step">
+                    <button onclick="prevStep(3)" class="btn-back">← Voltar para status</button>
+                    <h2 class="text-xl font-black mb-4 uppercase italic">4. Complexidade</h2>
+                    <button onclick="submitStep4('Pedido Grande')" class="btn-nav">É um pedido GRANDE? <span>→</span></button>
+                    <button onclick="submitStep4('Pedido Stacked')" class="btn-nav">É um pedido STACKED? <span>→</span></button>
+                    <button onclick="submitStep4('Nenhum')" class="btn-nav !bg-slate-400">Nenhum destes <span>→</span></button>
+                </div>
+
+                <div id="step5" class="step">
+                    <button onclick="prevStep(4)" class="btn-back">← Alterar complexidade</button>
+                    <h2 class="text-xl font-black mb-6 uppercase italic text-center">Tratativa Final</h2>
+                    <div id="final-instruction" class="space-y-4"></div>
+                    <button onclick="location.reload()" class="mt-8 w-full border-2 border-slate-900 py-3 rounded-xl font-black uppercase text-xs">Novo Atendimento</button>
+                </div>
+
+            </div>
         </div>
 
-        <div id="cancel-bar" class="bg-red-50 p-3 border-b border-red-100 hidden flex items-center justify-between px-8">
-            <span class="text-red-700 font-black text-[10px] uppercase">O cliente quer cancelar?</span>
-            <input type="checkbox" id="cancelToggle" onchange="checkCancelStatus()" class="w-5 h-5 accent-red-600">
+        <div class="w-full md:w-72 bg-slate-900 rounded-3xl p-6 text-white shadow-2xl self-start">
+            <h3 class="text-yellow-400 font-black text-xs uppercase tracking-widest mb-6 border-b border-slate-700 pb-2">Dados Recolhidos</h3>
+            <div id="summary" class="space-y-4">
+                <p class="text-[10px] text-slate-500 italic uppercase">Aguardando dados...</p>
+            </div>
         </div>
 
-        <div id="main-content" class="p-8 min-h-[400px]">
-            <div class="text-center text-gray-400 py-20">Carregando guia...</div>
-        </div>
-
-        <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-[10px] font-bold text-gray-400">
-            <span>RESOLVER CERTO E RÁPIDO</span>
-            <button onclick="location.reload()" class="text-slate-900 underline uppercase">Reiniciar</button>
-        </div>
     </div>
 
     <script>
-        let atrasoGlobal = 0;
-        let lastStep = "step1";
+        let data = {
+            atraso: 0,
+            modelo: "",
+            pronto: "",
+            complexidade: ""
+        };
 
-        // Função para garantir que o conteúdo muda
-        function render(html) {
-            const container = document.getElementById('main-content');
-            container.innerHTML = html;
-        }
+        const summaryEl = document.getElementById('summary');
 
-        // --- PASSO 1 ---
-        function step1() {
-            lastStep = "step1";
-            document.getElementById('cancel-bar').classList.add('hidden');
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase">1. Calcular Atraso</h2>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">ETA Previsto</label>
-                        <input type="time" id="eta" class="w-full p-3 border rounded-xl font-bold bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">Hora Atual</label>
-                        <input type="time" id="now" class="w-full p-3 border rounded-xl font-bold bg-gray-50">
-                    </div>
-                </div>
-                <button onclick="calcAtraso()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-md uppercase">Analisar Pedido</button>
-            `);
-        }
-
-        function calcAtraso() {
-            const t1 = document.getElementById('eta').value;
-            const t2 = document.getElementById('now').value;
-            if(!t1 || !t2) return alert("Insira as horas!");
-            
-            const [h1, m1] = t1.split(':').map(Number);
-            const [h2, m2] = t2.split(':').map(Number);
-            atrasoGlobal = (h2 * 60 + m2) - (h1 * 60 + m1);
-            
-            document.getElementById('cancel-bar').classList.remove('hidden');
-            step2();
-        }
-
-        // --- PASSO 2 ---
-        function step2() {
-            lastStep = "step2";
-            const compText = atrasoGlobal >= 15 ? 
-                `<div class="bg-green-100 text-green-700 p-2 rounded text-[10px] font-bold mb-4 text-center">Atraso de ${atrasoGlobal}min: Elegível para Compensação</div>` :
-                `<div class="bg-gray-100 text-gray-500 p-2 rounded text-[10px] font-bold mb-4 text-center">Atraso de ${atrasoGlobal}min: Sem Compensação</div>`;
-
-            render(`
-                ${compText}
-                <h2 class="text-xl font-black mb-4 uppercase italic">2. Tipo de Entrega</h2>
-                <button onclick="stepVendor()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl mb-3">Vendor Delivery (Loja)</button>
-                <button onclick="stepPlatform()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl">Platform Delivery (Glovo)</button>
-            `);
-        }
-
-        // --- PLATFORM ---
-        function stepPlatform() {
-            lastStep = "stepPlatform";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">3. Status do Pedido</h2>
-                <p class="text-sm font-bold mb-6 text-gray-500">O pedido foi marcado como "PRONTO" na App?</p>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepEstafeta()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
-                    <button onclick="stepLigarLoja()" class="bg-slate-100 text-slate-900 font-bold py-4 rounded-xl border">NÃO</button>
-                </div>
-            `);
-        }
-
-        function stepLigarLoja() {
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">Ligar para a Loja</h2>
-                <button onclick="render('<p class=\'p-4 bg-blue-50 text-sm font-bold\'>Validar horário. Se aberta, continuar.</p><button onclick=\'stepEstafeta()\' class=\'mt-4 w-full bg-slate-900 text-white py-3 rounded-xl\'>Seguir</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">1. Loja não atendeu</button>
-                <button onclick="lojaPronto()" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">2. Atendeu e pedido Pronto</button>
-                <button onclick="lojaNaoPrepara()" class="w-full border p-4 rounded-xl mb-2 text-left font-bold text-sm">3. Atendeu e NÃO vai preparar</button>
-            `);
-        }
-
-        function lojaPronto() {
-            render(`
-                <div class="bg-green-50 p-4 rounded-xl text-xs font-bold text-green-800 mb-4 border-l-4 border-green-500">
-                    "Informar ao cliente que a loja já preparou e a App deve atualizar a qualquer momento."
-                </div>
-                <button onclick="stepEstafeta()" class="w-full bg-slate-900 text-white py-3 rounded-xl">Continuar</button>
-            `);
-        }
-
-        function lojaNaoPrepara() {
-            render(`
-                <div class="bg-red-50 p-6 rounded-xl border-2 border-red-200">
-                    <h4 class="font-black text-red-600 uppercase mb-2">Cancelamento: Too Busy</h4>
-                    <p class="text-xs italic leading-relaxed text-red-900">"Infelizmente a loja não tem condições para preparar... já cancelamos sem custos + compensação!"</p>
-                </div>
-            `);
-        }
-
-        function stepEstafeta() {
-            lastStep = "stepEstafeta";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">4. Estafeta</h2>
-                <p class="text-sm font-bold mb-6 text-gray-500">Existe estafeta atribuído?</p>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepRiderMove()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
-                    <button onclick="render('<p class=\'bg-red-600 text-white p-6 rounded-xl font-bold text-center uppercase\'>Consultar Leadership</p>')" class="bg-slate-900 text-white font-bold py-4 rounded-xl">NÃO</button>
-                </div>
-            `);
-        }
-
-        function stepRiderMove() {
-            lastStep = "stepRiderMove";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">Comportamento</h2>
-                <p class="text-sm font-bold mb-6 text-gray-500">Estafeta parado ou direcção errada?</p>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="stepReatribuir()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">SIM</button>
-                    <button onclick="stepComplexidade()" class="bg-slate-900 text-white font-bold py-4 rounded-xl">NÃO</button>
-                </div>
-            `);
-        }
-
-        function stepReatribuir() {
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic text-red-600">Reatribuição</h2>
-                <div class="text-[10px] font-bold mb-6 space-y-1 opacity-70">
-                    <p>• Pedido Pronto / • Rider aceitou há 20min+</p>
-                    <p>• Rider parado ou direção errada / • NÃO é stacked</p>
-                </div>
-                <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-bold text-center uppercase\'>Reatribuir e informar cliente</p>')" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl mb-2">Cumpre Tudo (Sim)</button>
-                <button onclick="stepComplexidade()" class="w-full bg-slate-400 text-white font-bold py-4 rounded-xl">Algum é Não</button>
-            `);
-        }
-
-        function stepComplexidade() {
-            lastStep = "stepComplexidade";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">4. Complexidade</h2>
-                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs font-bold mb-4 border-l-4 border-blue-400\'>Script: Pedido entregue por mais de um estafeta (Pedido Grande).</div><button onclick=\'stepComplexidade()\' class=\'w-full border p-2\'>Voltar</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold">É um pedido GRANDE?</button>
-                <button onclick="render('<div class=\'bg-blue-50 p-4 rounded-xl text-xs font-bold mb-4 border-l-4 border-blue-400\'>Script: Rider termina entrega na área e segue para si (Stacked).</div><button onclick=\'stepComplexidade()\' class=\'w-full border p-2\'>Voltar</button>')" class="w-full border p-4 rounded-xl mb-2 text-left font-bold">É um pedido STACKED?</button>
-                <button onclick="render('<h2 class=\'text-center font-black py-10\'>Finalizar: Seções 6, 7 e 8</h2>')" class="w-full bg-slate-400 text-white font-bold py-4 rounded-xl">Nenhum</button>
-            `);
-        }
-
-        function stepVendor() {
-            lastStep = "stepVendor";
-            render(`
-                <h2 class="text-xl font-black mb-4 uppercase italic">Diagnóstico Loja</h2>
-                <div class="bg-orange-50 p-6 rounded-xl border-l-4 border-orange-400 mb-6 font-bold text-sm">
-                    Vendor Delivery: Contactar a loja imediatamente.
-                </div>
-                <button onclick="stepComplexidade()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl">Seguir</button>
-            `);
-        }
-
-        // --- CANCELAMENTO ---
-        function checkCancelStatus() {
-            const isChecked = document.getElementById('cancelToggle').checked;
-            if (isChecked) {
-                if (atrasoGlobal < 40) {
-                    render(`
-                        <div class="bg-red-50 p-6 rounded-2xl border-2 border-red-200 text-center">
-                            <h3 class="text-red-600 font-black text-xl mb-2 italic tracking-tighter">Cancelamento Indisponível</h3>
-                            <p class="text-xs font-bold text-red-900 italic">Atraso atual: ${atrasoGlobal} minutos.</p>
-                            <p class="text-[10px] mt-6 text-slate-400 font-black uppercase">Mínimo necessário: 40 minutos</p>
-                        </div>
-                    `);
-                } else {
-                    render(`
-                        <h2 class="text-xl font-black text-red-600 mb-4 uppercase italic">Validação Gratuita</h2>
-                        <div class="text-[10px] font-bold space-y-2 mb-6 opacity-60">
-                            <p>1. Atraso ≥ 40 min? ✓</p>
-                            <p>2. NÃO é stacked? / 3. Pick-up há 25min+?</p>
-                            <p>4. Rider no pick-up há 10min+? / 5. Rider NÃO pediu ajuda?</p>
-                        </div>
-                        <button onclick="render('<p class=\'bg-green-600 text-white p-6 rounded-xl font-bold text-center\'>Oferecer Cancelamento Gratuito</p>')" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl mb-2">Elegível (Tudo Sim)</button>
-                        <button onclick="stepComplexidade()" class="w-full bg-red-800 text-white font-bold py-4 rounded-xl">Não Elegível</button>
-                    `);
-                }
-            } else {
-                // Volta para o último passo guardado
-                window[lastStep]();
-            }
-        }
-
-        // Inicia assim que o DOM carregar
-        document.addEventListener('DOMContentLoaded', step1);
-    </script>
-</body>
-</html>
+        function updateSummary() {
+            let html = "";
+            if(data.atraso) html += `<div class="fade-in"><span class="block text-[9px] text-slate-500 uppercase font-bold">Atraso Calculado</span><span class="text-sm font-bold text-white">${data.atraso} Minutos</span></div>`;
+            if(data.modelo) html += `<div class="fade-in"><span class="block text-[9px] text-slate-500 uppercase font-bold">Modelo</span><span class="
