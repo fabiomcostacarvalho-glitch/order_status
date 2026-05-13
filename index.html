@@ -3,134 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Guide v5</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // ESTADO GLOBAL
-        var state = {
-            atraso: 0,
-            modelo: "",
-            isPronto: null,
-            lastStep: "step-calc"
-        };
-
-        // FUNÇÃO DE NAVEGAÇÃO
-        function setStep(stepId) {
-            // Esconder todos os passos
-            const steps = document.querySelectorAll('.step');
-            steps.forEach(s => s.style.display = 'none');
-            
-            // Mostrar o passo atual
-            const activeStep = document.getElementById(stepId);
-            if(activeStep) {
-                activeStep.style.display = 'block';
-                if (stepId !== 'step-cancel-check') state.lastStep = stepId;
-            }
-            updateLog();
-        }
-
-        // INICIAR FLUXO (O botão que não estava a funcionar)
-        function initFlow() {
-            const etaInput = document.getElementById('eta');
-            const nowInput = document.getElementById('now');
-            
-            if(!etaInput.value || !nowInput.value) {
-                alert("Por favor, preencha os dois campos de horário.");
-                return;
-            }
-            
-            const [h1, m1] = etaInput.value.split(':').map(Number);
-            const [h2, m2] = nowInput.value.split(':').map(Number);
-            state.atraso = (h2 * 60 + m2) - (h1 * 60 + m1);
-            
-            document.getElementById('cancelToggleContainer').style.display = 'flex';
-            setStep('step-model');
-        }
-
-        function setMode(mode) {
-            state.modelo = mode;
-            if(mode === 'Vendor') {
-                setMacro("Vendor Delivery: Contactar a loja imediatamente. Suporte não tem visibilidade do estafeta.");
-                setStep('step-complexity');
-            } else {
-                setStep('step-store');
-            }
-        }
-
-        function setStoreStatus(val) {
-            state.isPronto = val;
-            if(!val) setStep('step-store-diag');
-            else setStep('step-reattribution');
-        }
-
-        function diagLoja(tipo) {
-            if(tipo === 'nao_atende') {
-                setMacro("Macro: Validar horário de loja. Se aberta, seguir para análise de estafeta.");
-                setStep('step-reattribution');
-            } else if (tipo === 'pronto') {
-                setMacro("Macro: Informar cliente que o pedido está pronto e a app atualizará.");
-                setStep('step-reattribution');
-            } else {
-                document.getElementById('final-msg').innerText = "Macro Too Busy: Infelizmente a loja não tem condições para preparar... cancelado sem custos + compensação.";
-                setStep('step-final');
-            }
-        }
-
-        function toggleCancelMode() {
-            const isChecked = document.getElementById('wantsCancel').checked;
-            if(isChecked) {
-                setStep('step-cancel-check');
-                const denied = document.getElementById('cancel-denied');
-                const elig = document.getElementById('cancel-eligibility');
-                
-                if(state.atraso < 40) {
-                    denied.style.display = 'block';
-                    elig.style.display = 'none';
-                    document.getElementById('cancel-reason').innerText = "Atraso de " + state.atraso + "min. Mínimo: 40min.";
-                } else {
-                    denied.style.display = 'none';
-                    elig.style.display = 'block';
-                }
-            } else {
-                setStep(state.lastStep);
-            }
-        }
-
-        function setMacro(txt) {
-            document.getElementById('macroDisplay').innerText = txt;
-        }
-
-        function updateLog() {
-            const side = document.getElementById('sideLog');
-            if(!side) return;
-            side.innerHTML = `
-                <div><b class="text-slate-500 uppercase text-[9px]">Atraso:</b> ${state.atraso} min</div>
-                <div><b class="text-slate-500 uppercase text-[9px]">Modelo:</b> ${state.modelo || '---'}</div>
-                <div><b class="text-slate-500 uppercase text-[9px]">Pronto:</b> ${state.isPronto === null ? '---' : (state.isPronto ? 'Sim' : 'Não')}</div>
-            `;
-        }
-
-        window.onload = function() {
-            setStep('step-calc');
-        };
-    </script>
+    <title>Glovo Support Tool</title>
     <style>
-        .step { display: none; }
-        .btn-nav { @apply w-full bg-slate-900 text-white font-bold py-4 rounded-xl mb-3 flex justify-between items-center px-6 hover:bg-slate-800 transition-all; }
-        .check-box { @apply flex items-center gap-3 p-3 bg-gray-50 rounded-xl mb-2 text-xs font-bold cursor-pointer; }
+        /* CSS EMBEDDED - NÃO DEPENDE DE LINKS EXTERNOS */
+        body { background-color: #FFC244; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; color: #333; }
+        .card { background: white; width: 100%; max-width: 450px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
+        .header { background: #000045; color: white; padding: 25px; text-align: center; }
+        .header h1 { margin: 0; font-style: italic; color: #FFC244; font-size: 22px; }
+        .step { display: none; padding: 30px; }
+        .step.active { display: block; }
+        
+        .cancel-toggle { background: #FFF0F0; padding: 15px 25px; border-bottom: 1px solid #FFE0E0; display: none; justify-content: space-between; align-items: center; }
+        .cancel-text { color: #D00; font-size: 11px; font-weight: bold; }
+
+        label { display: block; font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        input[type="time"] { width: 100%; padding: 12px; border: 2px solid #EEE; border-radius: 12px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
+        
+        button { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
+        .btn-yellow { background: #FFC244; color: #000045; }
+        .btn-dark { background: #000045; color: white; }
+        .btn-gray { background: #F5F5F5; color: #333; border: 1px solid #DDD; }
+        .btn-red { background: #FF4444; color: white; }
+        
+        .alert { padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 13px; line-height: 1.4; border-left: 5px solid; }
+        .alert-error { background: #FFF0F0; color: #A00; border-color: #F44; }
+        .alert-info { background: #F0F7FF; color: #004085; border-color: #007bff; }
+        .footer { background: #F9F9F9; padding: 15px; text-align: center; font-size: 10px; color: #AAA; border-top: 1px solid #EEE; }
     </style>
 </head>
-<body class="bg-yellow-400 min-h-screen p-4 font-sans text-slate-900">
+<body>
 
-    <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 mt-4">
-        
-        <div class="flex-1 bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[550px]">
-            <div class="bg-slate-900 p-6 text-white text-center">
-                <h1 class="text-yellow-400 font-black text-xl uppercase italic">Glovo Support Guide</h1>
-                <div id="cancelToggleContainer" class="mt-4 bg-white/10 p-3 rounded-xl hidden items-center justify-between border border-white/20">
-                    <span class="text-[10px] font-bold uppercase italic">Cliente quer cancelar?</span>
-                    <input type="checkbox" id="wantsCancel" onchange="toggleCancelMode()" class="w-5 h-5 accent-red-600">
-                </div>
-            </div>
+<div class="card">
+    <div class="header">
+        <h1>GLOVO SUPPORT</h1>
+    </div>
 
-            <div class="p-8">
+    <div id="cancelBar" class="cancel-toggle">
+        <span class="cancel-text">CLIENTE PEDIU CANCELAMENTO?</span>
+        <input type="checkbox" id="checkCancel" onchange="toggleCancel()" style="transform: scale(1.5);">
+    </div>
+
+    <div id="step-calc" class="step active">
+        <h2 style="margin-top:0">1. Horário do Pedido</h2>
+        <label>ETA Previsto (App)</label>
+        <input type="time" id="eta">
+        <label>Hora Actual (Agora)</label>
+        <input type="time" id="agora">
+        <button class="btn-yellow" onclick="iniciar()">Analisar Atraso</button>
+    </div>
+
+    <div id="step-model" class="step">
+        <h2>2. Modelo de Entrega</h2>
+        <button class="btn-dark" onclick="setModelo('Vendor')">Vendor Delivery (Loja)</button>
+        <button class="btn-dark" onclick="setModelo('Platform')">Platform Delivery (Glovo)</button>
+    </div>
+
+    <div id="step-status" class="step">
+        <h2>3. Pedido está PRONTO?</h2>
+        <button class="btn-dark" onclick="navegar('step-reattribute')">SIM</button>
+        <button class="btn-dark" onclick="navegar('step-diag')">NÃO</button>
+    </div>
+
+    <div id="step-diag" class="step">
+        <h2>Diagnóstico da Loja</h2>
+        <button class="btn-gray" onclick="alert('Validar horário. Seguir fluxo.'); navegar('step-reattribute')">Loja não atende</button>
+        <button class="btn-gray" onclick="alert('Macro: Informar que já está pronto.'); navegar('step-reattribute')">Atendeu / Pronto</button>
+        <button class="btn-red" onclick="finalizar('TOO BUSY: Cancelar sem custos e compensar cliente.')">Atendeu / Não vai preparar</button>
+    </div>
+
+    <div id="step-reattribute" class="step">
+        <h2>4. Verificar Reatribuição</h2>
+        <p style="font-size: 12px; color: #666;">Check: Rider aceitou há 20m+, Pronto, Não é Stacked.</p>
+        <button class="btn-dark" onclick="navegar('step-complex')">Continuar Fluxo</button>
+    </div>
+
+    <div id="step-complex" class="step">
+        <h2>5. Complexidade</h2>
+        <button class="btn-gray" onclick="finalizar('Informar cliente: Pedido Grande (Multi-Rider)')">Pedido Grande</button>
+        <button class="btn-gray" onclick="finalizar('Informar cliente: Pedido Stacked (Rider em rota)')">Pedido Stacked</button>
+        <button class="btn-dark" onclick="finalizar('Seguir Seções 6, 7 e 8 do Guia')">Nenhum destes</button>
+    </div>
+
+    <div id="step-cancel-check" class="step">
+        <h2 style="color: #D00;">Validação</h2>
+        <div id="msg-erro" class="alert alert-error" style="display:none;">
+            <b>BLOQUEADO:</b> Atraso inferior a 40 minutos. Não oferecer cancelamento gratuito.
+        </div>
+        <div id="checklist-cancel" style="display:none;">
+            <p style="font-size: 13px;"><b>Validar Checklist:</b><br>✓ Não Stacked<br>✓ Pickup 25m+<br>✓ Rider Pickup 10m+</p>
+            <button class="btn-red" onclick="finalizar('Elegível: Proceder com Cancelamento Gratuito.')">Tudo Sim (Elegível)</button>
+        </div>
+    </div>
+
+    <div id="step-final" class="step" style="text-align: center;">
+        <h2>Instrução Final</h2>
+        <div id="msg-final" class="alert alert-info"></div>
+        <button class="btn-dark" onclick="location.reload()">Novo Atendimento</button>
+    </div>
+
+    <div class="footer">
+        RESOLVER CERTO E RÁPIDO
+    </div>
+</div>
+
+<script>
+    var globalAtraso = 0;
+    var ultimoPasso = "step-calc";
+
+    function navegar(id) {
+        var steps = document.getElementsByClassName('step');
+        for (var i = 0; i < steps.length; i++) {
+            steps[i].classList.remove('active');
+        }
+        document.getElementById(id).classList.add('active');
+        if (id !== 'step-cancel-check') ultimoPasso = id;
+    }
+
+    function iniciar() {
+        var t1 = document.getElementById('eta').value;
+        var t2 = document.getElementById('agora').value;
+        if (!t1 || !t2) { alert("Preencha os horários!"); return; }
+
+        var h1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
+        var h2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
+        globalAtraso = h2 - h1;
+
+        document.getElementById('cancelBar').style.display = 'flex';
+        navegar('step-model');
+    }
+
+    function setModelo(m) {
+        if (m === 'Vendor') navegar('step-complex');
+        else navegar('step-status');
+    }
+
+    function toggleCancel() {
+        var isChecked = document.getElementById('checkCancel').checked;
+        if (isChecked) {
+            navegar('step-cancel-check');
+            if (globalAtraso < 40) {
+                document.getElementById('msg-erro').style.display = 'block';
+                document.getElementById('checklist-cancel').style.display = 'none';
+            } else {
+                document.getElementById('msg-erro').style.display = 'none';
+                document.getElementById('checklist-cancel').style.display = 'block';
+            }
+        } else {
+            navegar(ultimoPasso);
+        }
+    }
+
+    function finalizar(txt) {
+        document.getElementById('msg-final').innerText = txt;
+        navegar('step-final');
+    }
+</script>
+
+</body>
+</html>
