@@ -6,80 +6,78 @@
     <title>Glovo | Guia de Atendimento Interativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .fade-in { animation: fadeIn 0.4s ease-in; }
+        .fade-in { animation: fadeIn 0.4s ease-in forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .btn-choice { @apply w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center group mb-3; }
-        .btn-cancel { @apply w-full bg-red-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-red-700 transition-all mb-4 flex justify-center items-center gap-2; }
+        .btn-choice { @apply w-full bg-slate-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-slate-800 transition-all flex justify-between items-center mb-3 shadow-md; }
+        .btn-cancel-active { @apply w-full bg-red-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-red-700 transition-all mb-4 text-center; }
     </style>
 </head>
 <body class="bg-yellow-400 min-h-screen flex items-center justify-center p-4 font-sans">
 
     <div id="app" class="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden fade-in">
-        <div class="bg-slate-900 p-6 text-white text-center relative">
+        <div class="bg-slate-900 p-6 text-white text-center">
             <h1 class="text-yellow-400 font-bold text-xl uppercase tracking-wider">Glovo | Guia de Atendimento</h1>
             <p class="text-sm opacity-80 italic">Foco: Redução de TMA + Aumento de CSAT</p>
         </div>
 
         <div id="cancel-zone" class="bg-red-50 p-4 border-b border-red-100 hidden">
             <label class="flex items-center justify-center gap-3 cursor-pointer">
-                <input type="checkbox" id="cancelTrigger" class="w-5 h-5 accent-red-600" onchange="toggleCancelFlow()">
-                <span class="text-red-700 font-bold text-sm uppercase">O cliente pediu o cancelamento?</span>
+                <input type="checkbox" id="cancelTrigger" class="w-6 h-6 accent-red-600" onchange="toggleCancelFlow()">
+                <span class="text-red-700 font-black text-xs uppercase tracking-tighter">O cliente pediu cancelamento?</span>
             </label>
         </div>
 
-        <div id="step-content" class="p-8 min-h-[400px]">
+        <div id="step-content" class="p-8 min-h-[420px]">
             </div>
 
-        <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-xs text-gray-400">
+        <div class="p-4 bg-gray-50 border-t flex justify-between items-center text-[10px] text-gray-400">
             <span>Atendemos pessoas. Conectamos experiências.</span>
-            <button onclick="startApp()" class="text-slate-900 font-bold underline">Reiniciar</button>
+            <button onclick="location.reload()" class="text-slate-900 font-bold underline">Reiniciar</button>
         </div>
     </div>
 
     <script>
+        // Estado da aplicação
         let state = {
             atrasoMinutos: 0,
-            isPlatform: false,
             currentStep: 'start'
         };
 
+        const container = document.getElementById('step-content');
+
         function render(html) {
-            document.getElementById('step-content').innerHTML = `<div class="fade-in">${html}</div>`;
+            container.innerHTML = `<div class="fade-in">${html}</div>`;
         }
 
-        // --- INÍCIO ---
-        function startApp() {
-            state.atrasoMinutos = 0;
+        // --- PASSO 1: ABERTURA ---
+        function stepStart() {
             state.currentStep = 'start';
             document.getElementById('cancel-zone').classList.add('hidden');
-            document.getElementById('cancelTrigger').checked = false;
-            
             render(`
-                <h2 class="text-2xl font-black text-slate-900 mb-4">1. Abertura do Atendimento</h2>
-                <p class="text-gray-600 mb-6 leading-relaxed">Cumprimente de forma objetiva e humanizada. Solicite um momento para análise.</p>
-                <div class="border-l-4 border-yellow-400 pl-4 italic text-gray-500 mb-8">"Vou verificar seu pedido agora e já te retorno com uma atualização, tudo bem?"</div>
+                <h2 class="text-2xl font-black text-slate-900 mb-4">1. Abertura</h2>
+                <p class="text-gray-600 mb-6 italic">"Vou verificar seu pedido agora e já te retorno..."</p>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-2 gap-4 mb-8">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">ETA Previsto</label>
-                        <input type="time" id="eta" class="w-full p-3 border rounded-xl bg-gray-50">
+                        <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">ETA Previsto</label>
+                        <input type="time" id="eta" class="w-full p-3 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Hora Actual</label>
-                        <input type="time" id="now" class="w-full p-3 border rounded-xl bg-gray-50">
+                        <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Hora Atual</label>
+                        <input type="time" id="now" class="w-full p-3 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold">
                     </div>
                 </div>
 
-                <button onclick="handleAtraso()" class="btn-choice">
-                    Analisar Atraso <span>→</span>
+                <button onclick="handleTime()" class="w-full bg-yellow-400 text-slate-900 font-black py-4 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform uppercase italic">
+                    Analisar Atraso →
                 </button>
             `);
         }
 
-        function handleAtraso() {
+        function handleTime() {
             const t1 = document.getElementById('eta').value;
             const t2 = document.getElementById('now').value;
-            if(!t1 || !t2) return alert("Por favor, preencha as horas.");
+            if(!t1 || !t2) return alert("Preencha os horários!");
 
             const [h1, m1] = t1.split(':').map(Number);
             const [h2, m2] = t2.split(':').map(Number);
@@ -89,20 +87,19 @@
             stepIdentificacao();
         }
 
-        // --- IDENTIFICAÇÃO ---
+        // --- PASSO 2: IDENTIFICAÇÃO ---
         function stepIdentificacao() {
             state.currentStep = 'identificacao';
-            const compMsg = state.atrasoMinutos >= 15 
-                ? `<div class="bg-green-100 text-green-700 p-3 rounded-lg text-xs font-bold mb-4 italic">✓ Atraso de ${state.atrasoMinutos}min: Compensação disponível.</div>`
-                : `<div class="bg-slate-100 text-slate-500 p-3 rounded-lg text-xs font-bold mb-4 italic">Atraso de ${state.atrasoMinutos}min: Sem compensação.</div>`;
+            const comp = state.atrasoMinutos >= 15 
+                ? `<div class="bg-green-100 text-green-700 p-3 rounded-lg text-xs font-bold mb-6 text-center italic">✓ Atraso de ${state.atrasoMinutos}min: Elegível para compensação.</div>`
+                : `<div class="bg-slate-100 text-slate-500 p-3 rounded-lg text-xs font-bold mb-6 text-center italic">Atraso de ${state.atrasoMinutos}min: Sem compensação.</div>`;
 
             render(`
-                <h2 class="text-2xl font-black text-slate-900 mb-2">2. Identificação</h2>
-                ${compMsg}
-                <p class="text-gray-600 mb-6">Qual o modelo de entrega deste pedido?</p>
-                
-                <button onclick="stepVendor()" class="btn-choice">Vendor Delivery (Loja) <span>→</span></button>
-                <button onclick="state.isPlatform=true; stepPlatform()" class="btn-choice">Platform Delivery (Glovo) <span>→</span></button>
+                <h2 class="text-xl font-black text-slate-900 mb-2">2. Identificação</h2>
+                ${comp}
+                <p class="text-sm font-bold text-slate-500 mb-6">Qual o tipo de entrega?</p>
+                <button onclick="stepVendor()" class="btn-choice">Vendor Delivery (Loja)<span>→</span></button>
+                <button onclick="stepPlatform()" class="btn-choice">Platform Delivery (Glovo)<span>→</span></button>
             `);
         }
 
@@ -110,12 +107,11 @@
         function stepVendor() {
             state.currentStep = 'vendor';
             render(`
-                <h2 class="text-2xl font-black text-slate-900 mb-4">3. Diagnóstico: LOJA</h2>
+                <h2 class="text-xl font-black text-slate-900 mb-4">3. Diagnóstico: LOJA</h2>
                 <div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-200 mb-6">
-                    <p class="text-orange-800 font-bold mb-2 uppercase text-sm">Ação Obrigatória:</p>
-                    <p class="text-orange-900">O suporte não tem visibilidade do estafeta. <b>Ligue para a loja imediatamente</b> para obter atualização.</p>
+                    <p class="text-orange-900 font-bold">Contactar a loja imediatamente. O suporte não tem visibilidade do estafeta de terceiros.</p>
                 </div>
-                <button onclick="stepComplexidade()" class="btn-choice">Avançar para Complexidade <span>→</span></button>
+                <button onclick="stepComplexidade()" class="btn-choice">Seguir Fluxo<span>→</span></button>
             `);
         }
 
@@ -123,12 +119,25 @@
         function stepPlatform() {
             state.currentStep = 'platform';
             render(`
-                <h2 class="text-2xl font-black text-slate-900 mb-4">3. Status do Pedido</h2>
-                <p class="text-gray-600 mb-6 font-medium italic">O pedido foi marcado como "PRONTO" na App?</p>
-                
+                <h2 class="text-xl font-black text-slate-900 mb-4">3. Status do Pedido</h2>
+                <p class="text-sm mb-6 font-bold text-slate-500 italic">O pedido foi marcado como "PRONTO" na App?</p>
                 <div class="grid grid-cols-2 gap-4">
                     <button onclick="stepEstafetaAssign()" class="btn-choice !justify-center">Sim</button>
-                    <button onclick="stepLigarLoja()" class="btn-choice !justify-center">Não</button>
+                    <button onclick="stepDiagnosticoLoja()" class="btn-choice !justify-center">Não</button>
                 </div>
             `);
         }
+
+        function stepDiagnosticoLoja() {
+            render(`
+                <h2 class="text-xl font-black text-slate-900 mb-4">Ligar para Loja</h2>
+                <button onclick="render('<p class=\'bg-blue-50 p-4 rounded-xl text-sm font-bold text-blue-800 mb-4\'>Validar horário da loja. Se aberta, continue análise.</p><button onclick=\'stepEstafetaAssign()\' class=\'btn-choice\'>Seguir</button>')" class="btn-choice text-sm">1. Loja não atendeu</button>
+                <button onclick="lojaPronto()" class="btn-choice text-sm">2. Atendeu e pedido Pronto</button>
+                <button onclick="lojaNaoPrepara()" class="btn-choice text-sm">3. Atendeu e NÃO vai preparar</button>
+            `);
+        }
+
+        function lojaPronto() {
+            render(`
+                <div class="bg-green-50 p-6 rounded-2xl border-2 border-green-200 mb-4 text-sm font-bold text-green-800 italic">
+                    "Informar ao cliente que a loja já preparou o pedido e a app deve atualizar em breve."
