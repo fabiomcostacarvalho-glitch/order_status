@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Guide v10</title>
+    <title>Glovo Support Guide v11</title>
     <style>
-        /* CSS INTERNO - NÃO DEPENDE DE LINKS EXTERNOS */
         :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; }
         body { background: var(--yellow); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
         .card { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
@@ -13,20 +12,25 @@
         .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
         .progress-bar { background: #eee; height: 6px; width: 100%; }
         #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
-        .step { display: none; padding: 25px; min-height: 350px; }
+        .step { display: none; padding: 25px; min-height: 380px; }
         .step.active { display: block; }
         .cancel-bar { background: #fff0f0; padding: 12px; border-bottom: 1px solid #ffe0e0; display: none; justify-content: space-between; align-items: center; }
-        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; text-transform: uppercase; font-size: 13px; }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
         .btn-yellow { background: var(--yellow); color: var(--navy); font-size: 15px; }
         .btn-navy { background: var(--navy); color: white; }
         .btn-gray { background: #f1f5f9; border: 1px solid #ddd; }
         .btn-red { background: var(--red); color: white; }
         input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-        .checklist { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 12px; }
+        
+        /* Estilo Checkboxes */
+        .checklist { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; font-weight: bold; color: var(--navy); cursor: pointer; }
+        .check-item input { width: 18px; height: 18px; cursor: pointer; }
+        
+        .back-link { background: none; color: #888; text-align: left; width: auto; padding: 0; margin-bottom: 15px; font-size: 11px; }
     </style>
 
     <script>
-        // TODA A LÓGICA NO TOPO
         var state = { atraso: 0, modelo: '', last: 1 };
 
         function navegar(n) {
@@ -46,19 +50,17 @@
             var t1 = document.getElementById('t-eta').value;
             var t2 = document.getElementById('t-now').value;
             if(!t1 || !t2) { alert("Preencha as horas!"); return; }
-
             var m1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
             var m2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
             state.atraso = m2 - m1;
-
             document.getElementById('cancelBar').style.display = 'flex';
             navegar(2);
         }
 
         function setModelo(m) {
             state.modelo = m;
-            if(m === 'Vendor') navegar(4); // Vai direto para chamada
-            else navegar(3); // Pergunta se está pronto
+            if(m === 'Vendor') navegar(4); 
+            else navegar(3); 
         }
 
         function toggleCancel() {
@@ -77,6 +79,21 @@
             }
         }
 
+        function validarRider() {
+            var c1 = document.getElementById('rc-assign').checked;
+            var c2 = document.getElementById('rc-time').checked;
+            var c3 = document.getElementById('rc-stacked').checked;
+            var c4 = document.getElementById('rc-pickup').checked;
+
+            var msg = "";
+            if (c1 && c2 && c3 && c4) {
+                msg = "✅ REATRIBUIÇÃO ELEGÍVEL: O estafeta aceitou há 20m+, o pedido está pronto e não é stacked. Proceder com a troca.";
+            } else {
+                msg = "⚠️ MANTER ESTAFETA: Critérios de reatribuição não atingidos. Informar cliente sobre a complexidade (Grande/Stacked).";
+            }
+            finalizar(msg);
+        }
+
         function finalizar(msg) {
             document.getElementById('f-msg').innerText = msg;
             navegar('final');
@@ -90,65 +107,72 @@
     <div class="progress-bar"><div id="progress-fill"></div></div>
 
     <div id="cancelBar" class="cancel-bar">
-        <span style="color:red; font-size:10px; font-weight:bold;">CLIENTE QUER CANCELAR?</span>
+        <span style="color:red; font-size:10px; font-weight:bold;">O CLIENTE QUER CANCELAR?</span>
         <input type="checkbox" id="c-check" onchange="toggleCancel()">
     </div>
 
     <div id="s1" class="step active">
         <h2 style="font-size:18px;">1. Calcular Atraso</h2>
-        <label style="font-size:10px; font-weight:bold; color:#888;">ETA PREVISTO</label>
+        <label>ETA PREVISTO</label>
         <input type="time" id="t-eta">
-        <label style="font-size:10px; font-weight:bold; color:#888;">HORA ATUAL</label>
+        <label>HORA ATUAL</label>
         <input type="time" id="t-now">
         <button class="btn-yellow" onclick="calcularAtraso()">Analisar Pedido →</button>
     </div>
 
     <div id="s2" class="step">
-        <button onclick="navegar(1)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(1)">← VOLTAR</button>
         <h2>2. Modelo de Entrega</h2>
         <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery</button>
         <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery</button>
     </div>
 
     <div id="s3" class="step">
-        <button onclick="navegar(2)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(2)">← VOLTAR</button>
         <h2>3. Status na App</h2>
-        <p style="font-size:13px;">O pedido está PRONTO?</p>
+        <p style="font-size:13px;">O pedido está PRONTO na App?</p>
         <button class="btn-navy" onclick="navegar(5)">SIM</button>
         <button class="btn-navy" onclick="navegar(4)">NÃO (Ligar Loja)</button>
     </div>
 
     <div id="s4" class="step">
-        <button onclick="navegar(state.modelo === 'Vendor' ? 2 : 3)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(state.modelo === 'Vendor' ? 2 : 3)">← VOLTAR</button>
         <h2>4. Ligar para Loja</h2>
-        <button class="btn-gray" onclick="navegar(5)">1. Não Atende</button>
-        <button class="btn-gray" onclick="navegar(5)">2. Pronto</button>
-        <button class="btn-red" onclick="finalizar('TOO BUSY: Cancelar e compensar.')">3. Não vai preparar</button>
+        <button class="btn-gray" onclick="navegar(5)">1. Loja não atende</button>
+        <button class="btn-gray" onclick="navegar(5)">2. Atendeu / Pronto</button>
+        <button class="btn-red" onclick="finalizar('TOO BUSY: Cancelar sem custos e adicionar compensação.')">3. Atendeu / Não vai preparar</button>
     </div>
 
     <div id="s5" class="step">
-        <button onclick="navegar(4)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(4)">← VOLTAR</button>
         <h2>5. Verificação Rider</h2>
         <div class="checklist">
-            Validar: Rider Aceite há 20m+, Estafeta assignado, Não Stacked.
+            <label class="check-item"><input type="checkbox" id="rc-assign"> Estafeta assignado</label>
+            <label class="check-item"><input type="checkbox" id="rc-time"> Aceitou há 20 min ou mais</label>
+            <label class="check-item"><input type="checkbox" id="rc-pickup"> Já realizou o Pick-up?</label>
+            <label class="check-item"><input type="checkbox" id="rc-stacked"> NÃO é Stacked Order</label>
         </div>
-        <button class="btn-navy" onclick="navegar('final'); finalizar('Seguir Seções 6, 7 e 8 do Guia.')">Validar e Finalizar</button>
+        <button class="btn-navy" onclick="validarRider()">Validar e Finalizar</button>
     </div>
 
     <div id="scancel" class="step">
         <h2 style="color:red;">Validação</h2>
-        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; padding:20px; border:2px solid red; border-radius:10px;">
+        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; padding:20px; border:2px solid red; border-radius:10px; text-align:center;">
             BLOQUEADO: Atraso inferior a 40 min.
         </div>
         <div id="c-ok" style="display:none;">
-            <p style="font-size:12px;">Validar: Não Stacked, Pickup 25m+, Rider 10m+.</p>
-            <button class="btn-red" onclick="finalizar('ELEGÍVEL: Cancelamento Gratuito.')">Tudo Sim (Elegível)</button>
+            <div class="checklist">
+                <label class="check-item"><input type="checkbox" class="can-check"> Não é Stacked Order</label>
+                <label class="check-item"><input type="checkbox" class="can-check"> Pick-up aconteceu há 25m+</label>
+                <label class="check-item"><input type="checkbox" class="can-check"> Rider no Pick-up há 10m+</label>
+            </div>
+            <button class="btn-red" onclick="finalizar('ELEGÍVEL: Proceder com Cancelamento Gratuito.')">Validar Elegibilidade</button>
         </div>
     </div>
 
     <div id="sfinal" class="step" style="text-align:center;">
         <h2>Instrução Final</h2>
-        <div id="f-msg" style="background:#f0f7ff; padding:20px; border-radius:10px; font-weight:bold; color:#004085; margin-bottom:20px;"></div>
+        <div id="f-msg" style="background:#f0f7ff; padding:20px; border-radius:10px; font-weight:bold; color:#004085; margin-bottom:20px; font-size:13px; line-height:1.4;"></div>
         <button class="btn-navy" onclick="location.reload()">Novo Atendimento</button>
     </div>
 
