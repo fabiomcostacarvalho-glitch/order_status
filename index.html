@@ -3,58 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Guide v9</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Glovo Support Guide v10</title>
     <style>
-        .step { display: none; }
-        .step.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .btn-navy { background-color: #000045; color: white; font-weight: bold; width: 100%; padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; text-transform: uppercase; transition: 0.2s; }
-        .btn-navy:hover { background-color: #000025; transform: translateY(-1px); }
-        .btn-yellow { background-color: #FFC244; color: #000045; font-weight: 900; width: 100%; padding: 1.25rem; border-radius: 1rem; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* CSS INTERNO - NÃO DEPENDE DE LINKS EXTERNOS */
+        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; }
+        body { background: var(--yellow); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: var(--navy); color: white; padding: 20px; text-align: center; }
+        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
+        .progress-bar { background: #eee; height: 6px; width: 100%; }
+        #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
+        .step { display: none; padding: 25px; min-height: 350px; }
+        .step.active { display: block; }
+        .cancel-bar { background: #fff0f0; padding: 12px; border-bottom: 1px solid #ffe0e0; display: none; justify-content: space-between; align-items: center; }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; text-transform: uppercase; font-size: 13px; }
+        .btn-yellow { background: var(--yellow); color: var(--navy); font-size: 15px; }
+        .btn-navy { background: var(--navy); color: white; }
+        .btn-gray { background: #f1f5f9; border: 1px solid #ddd; }
+        .btn-red { background: var(--red); color: white; }
+        input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
+        .checklist { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 12px; }
     </style>
+
+    <script>
+        // TODA A LÓGICA NO TOPO
+        var state = { atraso: 0, modelo: '', last: 1 };
+
+        function navegar(n) {
+            var steps = document.getElementsByClassName('step');
+            for(var i=0; i<steps.length; i++) steps[i].classList.remove('active');
+            
+            var target = document.getElementById('s' + n);
+            if(target) target.classList.add('active');
+            
+            if(n !== 'cancel' && n !== 'final') {
+                state.last = n;
+                document.getElementById('progress-fill').style.width = (n * 20) + '%';
+            }
+        }
+
+        function calcularAtraso() {
+            var t1 = document.getElementById('t-eta').value;
+            var t2 = document.getElementById('t-now').value;
+            if(!t1 || !t2) { alert("Preencha as horas!"); return; }
+
+            var m1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
+            var m2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
+            state.atraso = m2 - m1;
+
+            document.getElementById('cancelBar').style.display = 'flex';
+            navegar(2);
+        }
+
+        function setModelo(m) {
+            state.modelo = m;
+            if(m === 'Vendor') navegar(4); // Vai direto para chamada
+            else navegar(3); // Pergunta se está pronto
+        }
+
+        function toggleCancel() {
+            var isChecked = document.getElementById('c-check').checked;
+            if(isChecked) {
+                navegar('cancel');
+                if(state.atraso < 40) {
+                    document.getElementById('c-block').style.display = 'block';
+                    document.getElementById('c-ok').style.display = 'none';
+                } else {
+                    document.getElementById('c-block').style.display = 'none';
+                    document.getElementById('c-ok').style.display = 'block';
+                }
+            } else {
+                navegar(state.last);
+            }
+        }
+
+        function finalizar(msg) {
+            document.getElementById('f-msg').innerText = msg;
+            navegar('final');
+        }
+    </script>
 </head>
-<body class="bg-[#FFC244] min-h-screen p-4 font-sans text-[#000045]">
+<body>
 
-    <div class="max-w-xl mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col mt-4">
-        
-        <div class="bg-[#000045] p-6 text-center">
-            <h1 class="text-[#FFC244] font-black italic text-xl uppercase tracking-wider">Glovo Support Guide</h1>
-            <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
-                <div id="progress-bar" class="bg-[#FFC244] h-full transition-all duration-500" style="width: 20%"></div>
-            </div>
+<div class="card">
+    <div class="header"><h1>Glovo Support Guide</h1></div>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+
+    <div id="cancelBar" class="cancel-bar">
+        <span style="color:red; font-size:10px; font-weight:bold;">CLIENTE QUER CANCELAR?</span>
+        <input type="checkbox" id="c-check" onchange="toggleCancel()">
+    </div>
+
+    <div id="s1" class="step active">
+        <h2 style="font-size:18px;">1. Calcular Atraso</h2>
+        <label style="font-size:10px; font-weight:bold; color:#888;">ETA PREVISTO</label>
+        <input type="time" id="t-eta">
+        <label style="font-size:10px; font-weight:bold; color:#888;">HORA ATUAL</label>
+        <input type="time" id="t-now">
+        <button class="btn-yellow" onclick="calcularAtraso()">Analisar Pedido →</button>
+    </div>
+
+    <div id="s2" class="step">
+        <button onclick="navegar(1)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <h2>2. Modelo de Entrega</h2>
+        <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery</button>
+        <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery</button>
+    </div>
+
+    <div id="s3" class="step">
+        <button onclick="navegar(2)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <h2>3. Status na App</h2>
+        <p style="font-size:13px;">O pedido está PRONTO?</p>
+        <button class="btn-navy" onclick="navegar(5)">SIM</button>
+        <button class="btn-navy" onclick="navegar(4)">NÃO (Ligar Loja)</button>
+    </div>
+
+    <div id="s4" class="step">
+        <button onclick="navegar(state.modelo === 'Vendor' ? 2 : 3)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <h2>4. Ligar para Loja</h2>
+        <button class="btn-gray" onclick="navegar(5)">1. Não Atende</button>
+        <button class="btn-gray" onclick="navegar(5)">2. Pronto</button>
+        <button class="btn-red" onclick="finalizar('TOO BUSY: Cancelar e compensar.')">3. Não vai preparar</button>
+    </div>
+
+    <div id="s5" class="step">
+        <button onclick="navegar(4)" style="background:none; color:#888; text-align:left; width:auto; padding:0; margin-bottom:10px;">← VOLTAR</button>
+        <h2>5. Verificação Rider</h2>
+        <div class="checklist">
+            Validar: Rider Aceite há 20m+, Estafeta assignado, Não Stacked.
         </div>
+        <button class="btn-navy" onclick="navegar('final'); finalizar('Seguir Seções 6, 7 e 8 do Guia.')">Validar e Finalizar</button>
+    </div>
 
-        <div id="cancel-zone" class="bg-red-50 p-4 border-b border-red-100 hidden flex items-center justify-between px-8">
-            <span class="text-red-700 font-bold text-[10px] uppercase italic">O cliente quer cancelar?</span>
-            <input type="checkbox" id="cancel-trigger" class="w-6 h-6 accent-red-600 cursor-pointer">
+    <div id="scancel" class="step">
+        <h2 style="color:red;">Validação</h2>
+        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; padding:20px; border:2px solid red; border-radius:10px;">
+            BLOQUEADO: Atraso inferior a 40 min.
         </div>
+        <div id="c-ok" style="display:none;">
+            <p style="font-size:12px;">Validar: Não Stacked, Pickup 25m+, Rider 10m+.</p>
+            <button class="btn-red" onclick="finalizar('ELEGÍVEL: Cancelamento Gratuito.')">Tudo Sim (Elegível)</button>
+        </div>
+    </div>
 
-        <div id="content-area" class="p-8 min-h-[450px]">
+    <div id="sfinal" class="step" style="text-align:center;">
+        <h2>Instrução Final</h2>
+        <div id="f-msg" style="background:#f0f7ff; padding:20px; border-radius:10px; font-weight:bold; color:#004085; margin-bottom:20px;"></div>
+        <button class="btn-navy" onclick="location.reload()">Novo Atendimento</button>
+    </div>
 
-            <div id="step1" class="step active">
-                <h2 class="text-xl font-black mb-6 uppercase">1. Calcular Atraso</h2>
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">ETA Previsto</label>
-                        <input type="time" id="eta-val" class="w-full p-4 border-2 border-slate-100 rounded-2xl bg-slate-50 font-bold outline-none focus:border-[#FFC244]">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Hora Atual</label>
-                        <input type="time" id="now-val" class="w-full p-4 border-2 border-slate-100 rounded-2xl bg-slate-50 font-bold outline-none focus:border-[#FFC244]">
-                    </div>
-                </div>
-                <button id="btn-start" class="btn-yellow">Analisar Atraso →</button>
-            </div>
+</div>
 
-            <div id="step2" class="step">
-                <button class="back-btn text-[10px] font-bold text-slate-400 uppercase mb-4 block" data-target="1">← Voltar</button>
-                <h2 class="text-xl font-black mb-6 uppercase">2. Tipo de Entrega</h2>
-                <button class="btn-navy model-select" data-model="Vendor">Vendor Delivery (Loja)</button>
-                <button class="btn-navy model-select" data-model="Platform">Platform Delivery (Glovo)</button>
-            </div>
-
-            <div id="step3" class="step">
-                <button class="back-btn text-[10px] font-bold text-slate-400 uppercase mb-4 block" data-target="2">← Voltar</button>
-                <h2 class="text-xl font-black mb-6 uppercase">3. Status na App</h2>
-                <p class="text-sm font-bold text-slate
+</body>
+</html>
