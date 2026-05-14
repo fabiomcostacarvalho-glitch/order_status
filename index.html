@@ -3,91 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Expert Guide v8</title>
+    <title>Glovo Support Guide v9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --glovo-yellow: #FFC244; --glovo-navy: #000045; --glovo-red: #FF4444; }
-        body { background-color: var(--glovo-yellow); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: white; width: 100%; max-width: 500px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
-        
-        .header { background: var(--glovo-navy); color: white; padding: 20px; text-align: center; }
-        .header h1 { margin: 0; font-style: italic; color: var(--glovo-yellow); font-size: 20px; text-transform: uppercase; }
-        
-        .progress-container { background: #E2E8F0; height: 8px; width: 100%; }
-        #progress-bar { background: var(--glovo-yellow); height: 100%; width: 20%; transition: 0.4s; }
-
-        .cancel-toggle { background: #FFF0F0; padding: 12px 20px; border-bottom: 1px solid #FFE0E0; display: none; justify-content: space-between; align-items: center; }
-        .cancel-text { color: var(--glovo-red); font-size: 11px; font-weight: bold; }
-
-        .step { display: none; padding: 25px; min-height: 420px; }
-        .step.active { display: block; }
-        
-        .btn-back { background: none; border: none; color: #888; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-bottom: 15px; display: block; }
-        .btn-back:hover { color: #000; }
-
-        label { display: block; font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        input[type="time"] { width: 100%; padding: 12px; border: 2px solid #EEE; border-radius: 12px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-        
-        .checklist-item { display: flex; align-items: center; gap: 10px; background: #F8FAFC; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 12px; font-weight: 500; }
-        .checklist-item input { width: 18px; height: 18px; cursor: pointer; }
-
-        button { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; font-size: 13px; }
-        .btn-yellow { background: var(--glovo-yellow); color: var(--glovo-navy); }
-        .btn-navy { background: var(--glovo-navy); color: white; }
-        .btn-gray { background: #F1F5F9; color: #334155; border: 1px solid #E2E8F0; }
-        .btn-red { background: var(--glovo-red); color: white; }
-
-        .alert { padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 13px; border-left: 5px solid; }
-        .alert-error { background: #FFF0F0; color: #A00; border-color: var(--glovo-red); }
-        .alert-success { background: #F0FFF4; color: #22543D; border-color: #48BB78; }
-        
-        .summary-box { background: #F8FAFC; border-radius: 15px; padding: 15px; margin-top: 20px; font-size: 11px; color: #64748B; border: 1px solid #E2E8F0; }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .btn-navy { background-color: #000045; color: white; font-weight: bold; width: 100%; padding: 1rem; border-radius: 1rem; margin-bottom: 0.75rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-navy:hover { background-color: #000025; transform: translateY(-1px); }
+        .btn-yellow { background-color: #FFC244; color: #000045; font-weight: 900; width: 100%; padding: 1.25rem; border-radius: 1rem; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body>
+<body class="bg-[#FFC244] min-h-screen p-4 font-sans text-[#000045]">
 
-<div class="card">
-    <div class="header"><h1>Glovo Support Guide</h1></div>
-    <div class="progress-container"><div id="progress-bar"></div></div>
+    <div class="max-w-xl mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col mt-4">
+        
+        <div class="bg-[#000045] p-6 text-center">
+            <h1 class="text-[#FFC244] font-black italic text-xl uppercase tracking-wider">Glovo Support Guide</h1>
+            <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div id="progress-bar" class="bg-[#FFC244] h-full transition-all duration-500" style="width: 20%"></div>
+            </div>
+        </div>
 
-    <div id="cancelBar" class="cancel-toggle">
-        <span class="cancel-text">O CLIENTE QUER CANCELAR?</span>
-        <input type="checkbox" id="cancelCheck" onchange="checkCancelMode()" style="transform: scale(1.3);">
-    </div>
+        <div id="cancel-zone" class="bg-red-50 p-4 border-b border-red-100 hidden flex items-center justify-between px-8">
+            <span class="text-red-700 font-bold text-[10px] uppercase italic">O cliente quer cancelar?</span>
+            <input type="checkbox" id="cancel-trigger" class="w-6 h-6 accent-red-600 cursor-pointer">
+        </div>
 
-    <div id="step1" class="step active">
-        <h2>1. Identificar Atraso</h2>
-        <label>ETA Previsto</label>
-        <input type="time" id="eta">
-        <label>Hora Atual</label>
-        <input type="time" id="agora">
-        <button class="btn-yellow" onclick="irParaStep2()">Analisar Atraso</button>
-    </div>
+        <div id="content-area" class="p-8 min-h-[450px]">
 
-    <div id="step2" class="step">
-        <button class="btn-back" onclick="voltarPara(1)">← Voltar</button>
-        <h2>2. Tipo de Entrega</h2>
-        <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery (Loja)</button>
-        <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery (Glovo)</button>
-    </div>
+            <div id="step1" class="step active">
+                <h2 class="text-xl font-black mb-6 uppercase">1. Calcular Atraso</h2>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">ETA Previsto</label>
+                        <input type="time" id="eta-val" class="w-full p-4 border-2 border-slate-100 rounded-2xl bg-slate-50 font-bold outline-none focus:border-[#FFC244]">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Hora Atual</label>
+                        <input type="time" id="now-val" class="w-full p-4 border-2 border-slate-100 rounded-2xl bg-slate-50 font-bold outline-none focus:border-[#FFC244]">
+                    </div>
+                </div>
+                <button id="btn-start" class="btn-yellow">Analisar Atraso →</button>
+            </div>
 
-    <div id="step3" class="step">
-        <button class="btn-back" onclick="voltarPara(2)">← Voltar</button>
-        <h2>3. Status na Loja</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:20px;">O pedido já foi marcado como <b>PRONTO</b> na App?</p>
-        <button class="btn-navy" onclick="setPronto(true)">Sim (Pedido Pronto)</button>
-        <button class="btn-navy" onclick="setPronto(false)">Não (Ligar para Loja)</button>
-    </div>
+            <div id="step2" class="step">
+                <button class="back-btn text-[10px] font-bold text-slate-400 uppercase mb-4 block" data-target="1">← Voltar</button>
+                <h2 class="text-xl font-black mb-6 uppercase">2. Tipo de Entrega</h2>
+                <button class="btn-navy model-select" data-model="Vendor">Vendor Delivery (Loja)</button>
+                <button class="btn-navy model-select" data-model="Platform">Platform Delivery (Glovo)</button>
+            </div>
 
-    <div id="step4" class="step">
-        <button class="btn-back" onclick="handleBackFromDiag()">← Voltar</button>
-        <h2>4. Diagnóstico de Chamada</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:20px;">Ligue para a loja e identifique o status real:</p>
-        <button class="btn-gray" onclick="diagLoja('Loja não atendeu')">1. Loja não atendeu</button>
-        <button class="btn-gray" onclick="diagLoja('Loja confirmou pedido pronto')">2. Atendeu / Pedido Pronto</button>
-        <button class="btn-red" onclick="finalizar('TOO BUSY: Realizar cancelamento imediato e comunicar compensação.')">3. Atendeu / Não vai preparar</button>
-    </div>
-
-    <div id="step5" class="step">
-        <button class="btn-back" onclick="voltarPara(3)">← Voltar</button>
-        <h2>5. Verificação de Rider</h2>
-        <p style="font-size:11px; color:#666; margin-bottom:1
+            <div id="step3" class="step">
+                <button class="back-btn text-[10px] font-bold text-slate-400 uppercase mb-4 block" data-target="2">← Voltar</button>
+                <h2 class="text-xl font-black mb-6 uppercase">3. Status na App</h2>
+                <p class="text-sm font-bold text-slate
