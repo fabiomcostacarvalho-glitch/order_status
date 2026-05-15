@@ -3,151 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Guide v15</title>
+    <title>Glovo Support Dashboard v16</title>
     <style>
-        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; --gray: #f8fafc; }
-        body { background: var(--yellow); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .card { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 25px; box-sizing: border-box; }
-        .header { background: var(--navy); color: white; padding: 15px; text-align: center; border-radius: 15px; margin-bottom: 20px; }
-        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
+        /* DASHBOARD LAYOUT - FULL WIDTH */
+        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; --green: #22c55e; --bg: #f3f4f6; }
         
-        .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-        h2 { font-size: 14px; text-transform: uppercase; margin-bottom: 10px; color: var(--navy); }
+        body { background: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
         
-        label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; }
-        select, input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+        .dashboard { width: 100%; max-width: 1200px; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
         
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-opt { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #ddd; background: #fff; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-opt.active { background: var(--navy); color: white; border-color: var(--navy); }
+        .main-panel { background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 30px; }
+        .side-panel { background: var(--navy); border-radius: 20px; padding: 25px; color: white; height: fit-content; position: sticky; top: 20px; }
+        
+        .header { border-bottom: 2px solid var(--yellow); margin-bottom: 30px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-style: italic; color: var(--navy); text-transform: uppercase; font-size: 24px; }
+        
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        
+        .section-title { font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
+        
+        label { display: block; font-size: 11px; font-weight: bold; color: var(--navy); margin-bottom: 8px; }
+        
+        select, input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; box-sizing: border-box; outline: none; }
+        select:focus, input:focus { border-color: var(--yellow); }
 
-        #veredito { margin-top: 25px; padding: 20px; border-radius: 15px; background: #eff6ff; border-left: 6px solid #3b82f6; display: none; }
-        #veredito h3 { margin: 0 0 10px 0; font-size: 16px; color: #1e40af; text-transform: uppercase; }
-        #msg-final { font-size: 14px; font-weight: bold; line-height: 1.5; color: #1e3a8a; }
+        /* BUTTON GROUPS */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-opt { flex: 1; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.2s; color: var(--navy); }
+        .btn-opt:hover { background: #f8fafc; }
+        .btn-opt.active { background: var(--navy); color: white; border-color: var(--navy); }
         
-        .btn-reset { width: 100%; padding: 15px; background: var(--navy); color: white; border: none; border-radius: 10px; margin-top: 20px; cursor: pointer; font-weight: bold; }
+        /* RESULT CARD */
+        .result-box { background: #fffbeb; border: 2px solid var(--yellow); border-radius: 15px; padding: 20px; margin-top: 20px; }
+        .result-title { color: #92400e; font-weight: 900; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; }
+        .result-text { font-size: 16px; font-weight: bold; line-height: 1.5; color: #1e293b; }
+
+        /* MACRO BOX */
+        .macro-container { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; font-size: 13px; line-height: 1.5; border-left: 4px solid var(--yellow); }
+        
+        .btn-reset { width: 100%; background: var(--yellow); color: var(--navy); border: none; padding: 15px; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="header"><h1>Glovo Support Guide</h1></div>
-
-    <div class="section">
-        <h2>1. Tipo de Pedido e Atraso</h2>
-        <select id="cat" onchange="atualizar()">
-            <option value="Food">🍔 Food (Restaurantes)</option>
-            <option value="QCommerce">🛍️ Q-Commerce</option>
-        </select>
-        <div id="time-group" style="display: flex; gap: 10px;">
-            <div style="flex:1;"><label>ETA</label><input type="time" id="t-eta" onchange="atualizar()"></div>
-            <div style="flex:1;"><label>AGORA</label><input type="time" id="t-now" onchange="atualizar()"></div>
+<div class="dashboard">
+    <div class="main-panel">
+        <div class="header">
+            <h1>Glovo Support Expert</h1>
+            <span style="font-weight: bold; font-size: 12px; color: #64748b;">v16.0 STANDALONE</span>
         </div>
-    </div>
 
-    <div class="section">
-        <h2>2. Modelo e Contacto Loja</h2>
-        <div class="btn-group">
-            <button class="btn-opt" id="m-vendor" onclick="setM('Vendor')">Vendor</button>
-            <button class="btn-opt" id="m-platform" onclick="setM('Platform')">Platform</button>
+        <div class="section-title">1. Configuração do Pedido</div>
+        <div class="grid-inputs">
+            <div>
+                <label>Categoria</label>
+                <select id="cat" onchange="run()">
+                    <option value="Food">🍔 Food (Restaurantes)</option>
+                    <option value="QCommerce">🛍️ Q-Commerce</option>
+                </select>
+            </div>
+            <div id="time-inputs">
+                <label>ETA vs Agora (Cálculo de Atraso)</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="time" id="t-eta" onchange="run()">
+                    <input type="time" id="t-now" onchange="run()">
+                </div>
+            </div>
+            <div>
+                <label>Modelo de Entrega</label>
+                <div class="btn-group">
+                    <button class="btn-opt" id="m-vendor" onclick="setM('Vendor')">Vendor</button>
+                    <button class="btn-opt" id="m-platform" onclick="setM('Platform')">Platform</button>
+                </div>
+            </div>
         </div>
-        <p style="font-size:10px; font-weight:bold; color:#888; margin: 10px 0 5px 0;">STATUS DA CHAMADA NA LOJA:</p>
+
+        <div class="section-title">2. Diagnóstico de Contacto (Parceiro)</div>
         <div class="btn-group">
             <button class="btn-opt" id="l-nao" onclick="setL('nao_atende')">Não Atende</button>
             <button class="btn-opt" id="l-pronto" onclick="setL('pronto')">Pronto</button>
-            <button class="btn-opt" id="l-recusa" onclick="setL('recusa')">Recusa</button>
+            <button class="btn-opt" id="l-recusa" onclick="setL('recusa')">Recusa Preparar</button>
+        </div>
+
+        <div id="rider-block" style="display: none;">
+            <div class="section-title">3. Verificação do Estafeta (Apenas Platform)</div>
+            <div class="grid-inputs">
+                <div>
+                    <label>Tem Estafeta Atribuído?</label>
+                    <div class="btn-group">
+                        <button class="btn-opt" id="q1y" onclick="setQ(1,true)">SIM</button>
+                        <button class="btn-opt" id="q1n" onclick="setQ(1,false)">NÃO</button>
+                    </div>
+                </div>
+                <div>
+                    <label>Foi recolhido (Pick-up)?</label>
+                    <div class="btn-group">
+                        <button class="btn-opt" id="q2y" onclick="setQ(2,true)">SIM</button>
+                        <button class="btn-opt" id="q2n" onclick="setQ(2,false)">NÃO</button>
+                    </div>
+                </div>
+                <div>
+                    <label>Rider Parado / Aceite 20m+?</label>
+                    <div class="btn-group">
+                        <button class="btn-opt" id="q3y" onclick="setQ(3,true)">SIM</button>
+                        <button class="btn-opt" id="q3n" onclick="setQ(3,false)">NÃO</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-area" style="display: none;">
+            <div class="result-box">
+                <div class="result-title text-navy">💡 Instrução de Procedimento</div>
+                <div id="msg-final" class="result-text text-navy"></div>
+            </div>
         </div>
     </div>
 
-    <div id="rider-section" class="section" style="display:none;">
-        <h2>3. Dados do Rider (Platform)</h2>
-        <label>1. Tem estafeta atribuído?</label>
-        <div class="btn-group mb-2">
-            <button class="btn-opt" id="q1y" onclick="setQ(1,true)">SIM</button>
-            <button class="btn-opt" id="q1n" onclick="setQ(1,false)">NÃO</button>
+    <div class="side-panel">
+        <h3 style="margin-top: 0; font-size: 14px; text-transform: uppercase; color: var(--yellow);">Resumo do Caso</h3>
+        <div id="summary-data" style="font-size: 12px; line-height: 2;">
+            <p>Selecione os dados à esquerda...</p>
         </div>
-        <label style="margin-top:10px;">2. Foi recolhido (Pick-up)?</label>
-        <div class="btn-group">
-            <button class="btn-opt" id="q2y" onclick="setQ(2,true)">SIM</button>
-            <button class="btn-opt" id="q2n" onclick="setQ(2,false)">NÃO</button>
-        </div>
-        <label style="margin-top:10px;">3. Aceite há 20m+ / Rider Parado?</label>
-        <div class="btn-group">
-            <button class="btn-opt" id="q3y" onclick="setQ(3,true)">SIM</button>
-            <button class="btn-opt" id="q3n" onclick="setQ(3,false)">NÃO</button>
-        </div>
-    </div>
 
-    <div id="veredito">
-        <h3>Resultado Recomendado:</h3>
-        <div id="msg-final"></div>
-        <button class="btn-reset" onclick="location.reload()">Limpar / Novo Caso</button>
+        <h3 style="margin-top: 30px; font-size: 14px; text-transform: uppercase; color: var(--yellow);">Macro Recomendada</h3>
+        <div class="macro-container" id="macro-text">
+            O script de resposta aparecerá aqui.
+        </div>
+
+        <button class="btn-reset" onclick="location.reload()">Novo Atendimento</button>
     </div>
 </div>
 
 <script>
     var s = { cat: 'Food', m: '', l: '', q1: null, q2: null, q3: null };
 
-    function setM(val) { 
-        s.m = val; 
-        document.getElementById('m-vendor').className = val == 'Vendor' ? 'btn-opt active' : 'btn-opt';
-        document.getElementById('m-platform').className = val == 'Platform' ? 'btn-opt active' : 'btn-opt';
-        document.getElementById('rider-section').style.display = val == 'Platform' ? 'block' : 'none';
-        atualizar(); 
+    function setM(v) { 
+        s.m = v; 
+        document.getElementById('m-vendor').classList.toggle('active', v==='Vendor');
+        document.getElementById('m-platform').classList.toggle('active', v==='Platform');
+        document.getElementById('rider-block').style.display = (v === 'Platform') ? 'block' : 'none';
+        run(); 
     }
-    function setL(val) { 
-        s.l = val; 
-        document.getElementById('l-nao').className = val == 'nao_atende' ? 'btn-opt active' : 'btn-opt';
-        document.getElementById('l-pronto').className = val == 'pronto' ? 'btn-opt active' : 'btn-opt';
-        document.getElementById('l-recusa').className = val == 'recusa' ? 'btn-opt active' : 'btn-opt';
-        atualizar(); 
+    function setL(v) { 
+        s.l = v; 
+        document.getElementById('l-nao').classList.toggle('active', v==='nao_atende');
+        document.getElementById('l-pronto').classList.toggle('active', v==='pronto');
+        document.getElementById('l-recusa').classList.toggle('active', v==='recusa');
+        run(); 
     }
-    function setQ(n, val) { 
-        s['q'+n] = val; 
-        document.getElementById('q'+n+'y').className = val ? 'btn-opt active' : 'btn-opt';
-        document.getElementById('q'+n+'n').className = !val ? 'btn-opt active' : 'btn-opt';
-        atualizar(); 
+    function setQ(n, v) { 
+        s['q'+n] = v; 
+        document.getElementById('q'+n+'y').classList.toggle('active', v===true);
+        document.getElementById('q'+n+'n').classList.toggle('active', v===false);
+        run(); 
     }
 
-    function atualizar() {
+    function run() {
         s.cat = document.getElementById('cat').value;
-        document.getElementById('time-group').style.display = s.cat == 'Food' ? 'flex' : 'none';
+        document.getElementById('time-inputs').style.opacity = (s.cat === 'Food') ? '1' : '0.3';
         
-        var msg = "";
         var t1 = document.getElementById('t-eta').value;
         var t2 = document.getElementById('t-now').value;
         var atraso = 0;
-        if(t1 && t2) atraso = (parseInt(t2.split(':')[0])*60+parseInt(t2.split(':')[1])) - (parseInt(t1.split(':')[0])*60+parseInt(t1.split(':')[1]));
-
-        if(!s.m || !s.l) return;
-
-        // 1. LOJA RECUSA
-        if(s.l == 'recusa') msg = "LOJA SATURADA: Realizar cancelamento imediato e compensar o cliente.";
-        
-        // 2. VENDOR
-        else if(s.m == 'Vendor') {
-            if(s.l == 'nao_atende') msg = "PARCEIRO NÃO ATENDE: Negar cancelamento. Cliente deve aguardar ou cancelar COM CUSTOS.";
-            else msg = "VENDOR PRONTO: Parceiro confirmou entrega em curso. Aguardar ou cancelar COM CUSTOS.";
+        if(t1 && t2) {
+            var m1 = parseInt(t1.split(':')[0])*60 + parseInt(t1.split(':')[1]);
+            var m2 = parseInt(t2.split(':')[0])*60 + parseInt(t2.split(':')[1]);
+            atraso = m2 - m1;
         }
-        
-        // 3. PLATFORM
-        else if(s.m == 'Platform') {
-            if(s.q1 === null || s.q2 === null) msg = "A aguardar dados do Rider (Pergunta 1 e 2)...";
-            else if(s.cat == 'QCommerce') {
-                msg = !s.q1 ? "Q-COMMERCE: Sem estafeta. CANCELAMENTO GRATUITO permitido." : "Q-COMMERCE: Com estafeta. Cancelamento COM CUSTOS.";
+
+        var res = "";
+        var macro = "";
+
+        // LÓGICA DE DECISÃO
+        if(!s.m || !s.l) {
+            res = "Aguardando definição de Modelo e Diagnóstico de Loja...";
+        } else if(s.l === 'recusa') {
+            res = "LOJA SATURADA: Proceder com o cancelamento imediato e informar o cliente.";
+            macro = "Infelizmente, a loja informou que não consegue processar o seu pedido devido ao elevado volume de pedidos. Já cancelamos o seu pedido sem custos.";
+        } else if(s.m === 'Vendor') {
+            if(s.l === 'nao_atende') {
+                res = "PARCEIRO NÃO ATENDE: Negar cancelamento gratuito. Cliente deve aguardar ou cancelar COM CUSTOS.";
+                macro = "Tentámos contactar a loja, mas sem sucesso. Para já, pedimos que aguarde a entrega. Caso pretenda cancelar agora, haverá custos associados.";
             } else {
-                if(atraso >= 40 && !s.q2) msg = "FOOD: Atraso > 40min e não recolhido. CANCELAMENTO GRATUITO permitido.";
-                else if(s.q1 && s.q3 && !s.q2) msg = "REATRIBUIÇÃO: Rider parado/atrasado. Proceder com a troca de estafeta.";
-                else msg = "MANTER: Informar cliente que o pedido está em curso. Se insistir, cancelamento COM CUSTOS.";
-            }
-        }
-
-        if(msg) {
-            document.getElementById('veredito').style.display = 'block';
-            document.getElementById('msg-final').innerText = msg;
-        }
-    }
-</script>
-
-</body>
-</html>
+                res = "VENDOR PRONTO: Pedido confirmado pela loja. Aguardar entrega ou cancelar COM CUSTOS.";
