@@ -5,243 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glovo Support Guide v19</title>
     <style>
-        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; }
-        body { background: var(--yellow); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: white; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
-        .header { background: var(--navy); color: white; padding: 20px; text-align: center; }
-        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
-        .progress-bar { background: #eee; height: 6px; width: 100%; }
-        #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
-        .step { display: none; padding: 25px; min-height: 400px; }
+        :root { --navy: #000045; --yellow: #FFC244; --red: #E24B4A; --bg: #ffffff; --bg2: #f8fafc; --text: #1a1a2e; --text2: #666; --border: rgba(0,0,0,0.12); }
+        * { box-sizing: border-box; }
+        body { background: var(--yellow); min-height: 100vh; display: flex; justify-content: center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; }
+        .card { background: var(--bg); width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; align-self: flex-start; }
+        .header { background: var(--navy); padding: 18px; text-align: center; }
+        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 16px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .prog { background: #ddd; height: 5px; }
+        .prog-fill { background: var(--yellow); height: 100%; transition: width 0.3s; }
+        .cancel-bar { background: #fff0f0; padding: 10px 16px; border-bottom: 1px solid #ffd0d0; display: none; justify-content: space-between; align-items: center; }
+        .cancel-bar span { color: var(--red); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .step { display: none; padding: 22px; min-height: 340px; }
         .step.active { display: block; }
-        .cancel-bar { background: #fff0f0; padding: 12px; border-bottom: 1px solid #ffe0e0; display: none; justify-content: space-between; align-items: center; }
-        button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
-        .btn-yellow { background: var(--yellow); color: var(--navy); font-size: 15px; }
+        .step h2 { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 16px; }
+        .step p { font-size: 13px; color: var(--text2); margin: 0 0 14px; line-height: 1.5; }
+        button { width: 100%; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-bottom: 9px; text-transform: uppercase; font-size: 12px; transition: opacity 0.15s; }
+        button:hover { opacity: 0.85; }
         .btn-navy { background: var(--navy); color: white; }
-        .btn-gray { background: #f1f5f9; border: 1px solid #ddd; color: #333; }
+        .btn-yellow { background: var(--yellow); color: var(--navy); }
+        .btn-gray { background: var(--bg2); border: 1px solid var(--border); color: var(--text); }
         .btn-red { background: var(--red); color: white; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-group button { flex: 1; }
-        .selected-yes { background: #dcfce7 !important; border: 2px solid #22c55e !important; color: #166534 !important; }
-        .selected-no { background: #fee2e2 !important; border: 2px solid #ef4444 !important; color: #991b1b !important; }
-        input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-        .back-link { background: none; color: #888; text-align: left; width: auto; padding: 0; margin-bottom: 15px; font-size: 11px; }
-        .check-box { background: #f8fafc; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
-        .check-box label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 10px; color: var(--navy); }
+        .btn-back { background: none; border: none; color: var(--text2); font-size: 11px; cursor: pointer; padding: 0; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; width: auto; display: block; }
+        input[type="time"] { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 12px; font-size: 15px; background: var(--bg); color: var(--text); }
+        .checklist { background: var(--bg2); padding: 14px; border-radius: 10px; margin-bottom: 14px; }
+        .checklist-title { font-size: 11px; color: var(--text2); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; }
+        .check-item:last-child { margin-bottom: 0; }
+        .check-item input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--navy); }
+        .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .badge-qcom { background: #e1f5ee; color: #0f6e56; }
+        .badge-food { background: #faeeda; color: #854f0b; }
+        label.field-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+        .result-box { padding: 18px; border-radius: 10px; font-weight: 500; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+        .result-ok { background: #eaf3de; color: #3b6d11; border: 1px solid #c0dd97; }
+        .result-warn { background: #faeeda; color: #854f0b; border: 1px solid #fac775; }
+        .result-err { background: #fcebeb; color: #a32d2d; border: 1px solid #f7c1c1; }
     </style>
-
-    <script>
-        var state = { atraso: 0, modelo: '', tipo: 'Food', last: 1, q: {} };
-
-        function navegar(n) {
-            var steps = document.getElementsByClassName('step');
-            for(var i=0; i<steps.length; i++) steps[i].classList.remove('active');
-            var target = document.getElementById('s' + n);
-            if(target) target.classList.add('active');
-            if(n !== 'cancel' && n !== 'final') {
-                state.last = n;
-                document.getElementById('progress-fill').style.width = (n * 20) + '%';
-            }
-        }
-
-        function setTipo(t) {
-            state.tipo = t;
-            if(t === 'QCommerce') {
-                state.atraso = 0;
-                document.getElementById('cancelBar').style.display = 'flex';
-                navegar(5); // Vai direto para a verificação de Rider simplificada
-            } else {
-                navegar(1.5);
-            }
-        }
-
-        function setAns(id, val) {
-            state.q[id] = val;
-            document.getElementById(id + '-y').className = val ? 'selected-yes' : 'btn-gray';
-            document.getElementById(id + '-n').className = !val ? 'selected-no' : 'btn-gray';
-        }
-
-        function calcularAtraso() {
-            var t1 = document.getElementById('t-eta').value;
-            var t2 = document.getElementById('t-now').value;
-            if(!t1 || !t2) { alert("Preencha as horas!"); return; }
-            var m1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
-            var m2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
-            state.atraso = m2 - m1;
-            document.getElementById('cancelBar').style.display = 'flex';
-            navegar(2);
-        }
-
-        function setModelo(m) {
-            state.modelo = m;
-            if(m === 'Vendor') navegar(4); 
-            else navegar(3); 
-        }
-
-        function toggleCancel() {
-            var isChecked = document.getElementById('c-check').checked;
-            if(isChecked) {
-                navegar('cancel');
-                var block = document.getElementById('c-block');
-                var ok = document.getElementById('c-ok');
-                if(state.tipo === 'Food' && state.atraso < 40) {
-                    block.style.display = 'block'; ok.style.display = 'none';
-                } else {
-                    block.style.display = 'none'; ok.style.display = 'block';
-                }
-            } else { navegar(state.last); }
-        }
-
-        function diagVendor(res) {
-            if(res === 'too_busy') finalizar("✅ LOJA SATURADA: Realizar cancelamento imediato e gratuito.");
-            else if(res === 'nao_atende') finalizar("❌ NEGADO: Parceiro não atende. Cliente deve aguardar. Se insistir, cancelar COM CUSTOS.");
-            else navegar(5);
-        }
-
-        function validarFinal() {
-            // LÓGICA Q-COMMERCE
-            if(state.tipo === 'QCommerce') {
-                if(state.q['assign'] === false) finalizar("✅ Q-COMMERCE: Sem estafeta atribuído. CANCELAMENTO GRATUITO permitido.");
-                else if(state.q['assign'] === true) finalizar("❌ Q-COMMERCE: Com estafeta atribuído. Cancelamento terá CUSTOS.");
-                else alert("Selecione se tem estafeta!");
-                return;
-            }
-
-            // LÓGICA FOOD
-            if(state.q['pickup'] === true) {
-                finalizar("⚠️ PEDIDO RECOLHIDO: O estafeta já tem o pedido. Aguardar entrega. Se insistir, cancelar COM CUSTOS.");
-            } else if(state.atraso >= 40) {
-                finalizar("✅ ELEGÍVEL: Atraso > 40min e não recolhido. Proceder com cancelamento gratuito.");
-            } else if(state.q['assign'] && state.q['time'] && state.q['stacked']) {
-                finalizar("✅ REATRIBUIÇÃO: Critérios atingidos. Proceder com a troca de Rider.");
-            } else {
-                finalizar("⚠️ MANTER: Critérios de reatribuição não atingidos. Informar complexidade (Grande/Stacked).");
-            }
-        }
-
-        function finalizar(msg) {
-            document.getElementById('f-msg').innerText = msg;
-            navegar('final');
-        }
-    </script>
 </head>
 <body>
 
 <div class="card">
     <div class="header"><h1>Glovo Support Guide</h1></div>
-    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <div class="prog"><div class="prog-fill" id="prog" style="width:10%"></div></div>
 
     <div id="cancelBar" class="cancel-bar">
-        <span style="color:red; font-size:10px; font-weight:bold;">O CLIENTE QUER CANCELAR?</span>
+        <span>O cliente quer cancelar?</span>
         <input type="checkbox" id="c-check" onchange="toggleCancel()">
     </div>
 
     <div id="s1" class="step active">
-        <h2>1. Tipo de Pedido</h2>
-        <button class="btn-navy" onclick="setTipo('Food')">🍔 Food (Restaurantes)</button>
-        <button class="btn-navy" onclick="setTipo('QCommerce')">🛍️ Q-Commerce (Lojas/Super)</button>
+        <h2>1. Tipo de pedido</h2>
+        <button class="btn-navy" onclick="setTipo('Food')">🍔 Restaurantes (Food)</button>
+        <button class="btn-navy" onclick="setTipo('QCommerce')">🛍️ Q-Commerce (Lojas / Super)</button>
     </div>
 
-    <div id="s1.5" class="step">
-        <button class="back-link" onclick="navegar(1)">← VOLTAR</button>
-        <h2>Cálculo de Atraso (Food)</h2>
-        <label>ETA PREVISTO</label><input type="time" id="t-eta">
-        <label>HORA ATUAL</label><input type="time" id="t-now">
-        <button class="btn-yellow" onclick="calcularAtraso()">Analisar →</button>
+    <div id="s-qc1" class="step">
+        <button class="btn-back" onclick="navegar('1')">← Voltar</button>
+        <span class="badge badge-qcom">Q-Commerce</span>
+        <h2>O pedido está pronto?</h2>
+        <p>Verifica o status do pedido na app antes de continuar.</p>
+        <button class="btn-navy" onclick="navegar('qc2-pronto')">Sim — pedido pronto</button>
+        <button class="btn-navy" onclick="navegar('qc2-nao')">Não — ainda não está pronto</button>
+    </div>
+
+    <div id="s-qc2-pronto" class="step">
+        <button class="btn-back" onclick="navegar('qc1')">← Voltar</button>
+        <span class="badge badge-qcom">Q-Commerce</span>
+        <h2>Tem estafeta atribuído?</h2>
+        <p>Verifica na app se existe um rider assignado ao pedido.</p>
+        <button class="btn-red" onclick="finalizar('err','CANCELAMENTO COM CUSTOS — Estafeta já atribuído. O cliente será cobrado pelo cancelamento.')">Sim — tem rider</button>
+        <button class="btn-navy" onclick="finalizar('ok','CANCELAMENTO GRATUITO — Sem estafeta atribuído. Proceder com cancelamento sem custos para o cliente.')">Não — sem rider</button>
+    </div>
+
+    <div id="s-qc2-nao" class="step">
+        <button class="btn-back" onclick="navegar('qc1')">← Voltar</button>
+        <span class="badge badge-qcom">Q-Commerce</span>
+        <h2>Ligar para a loja</h2>
+        <button class="btn-gray" onclick="diagVendor('nao_atende')">Loja não atende</button>
+        <button class="btn-gray" onclick="navegar('qc2-pronto')">Atendeu — pedido pronto agora</button>
+        <button class="btn-red" onclick="diagVendor('too_busy')">Atendeu — recusa preparar</button>
+    </div>
+
+    <div id="s1-5" class="step">
+        <button class="btn-back" onclick="navegar('1')">← Voltar</button>
+        <span class="badge badge-food">Food</span>
+        <h2>Cálculo de atraso</h2>
+        <label class="field-label">ETA previsto</label>
+        <input type="time" id="t-eta">
+        <label class="field-label">Hora atual</label>
+        <input type="time" id="t-now">
+        <button class="btn-yellow" onclick="calcularAtraso()">Analisar pedido →</button>
     </div>
 
     <div id="s2" class="step">
-        <button class="back-link" onclick="navegar(1.5)">← VOLTAR</button>
-        <h2>2. Modelo de Entrega</h2>
+        <button class="btn-back" onclick="navegar('1-5')">← Voltar</button>
+        <span class="badge badge-food">Food</span>
+        <h2>2. Modelo de entrega</h2>
         <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery</button>
         <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery</button>
     </div>
 
     <div id="s3" class="step">
-        <button class="back-link" onclick="navegar(2)">← VOLTAR</button>
-        <h2>3. Status na App</h2>
-        <p style="font-size:13px;">O pedido está PRONTO na App?</p>
-        <button class="btn-navy" onclick="navegar(5)">SIM</button>
-        <button class="btn-navy" onclick="navegar(4)">NÃO (Ligar Loja)</button>
+        <button class="btn-back" onclick="navegar('2')">← Voltar</button>
+        <span class="badge badge-food">Food</span>
+        <h2>3. Status na app</h2>
+        <p>O pedido está marcado como <strong>Pronto</strong> na app?</p>
+        <button class="btn-navy" onclick="navegar('5')">Sim — está pronto</button>
+        <button class="btn-navy" onclick="navegar('4')">Não — ligar para a loja</button>
     </div>
 
     <div id="s4" class="step">
-        <button class="back-link" onclick="navegar(state.modelo === 'Vendor' ? 2 : 3)">← VOLTAR</button>
-        <h2>4. Ligar para Loja</h2>
-        <button class="btn-gray" onclick="diagVendor('nao_atende')">1. Loja não atende</button>
-        <button class="btn-gray" onclick="diagVendor('pronto')">2. Atendeu / Pronto</button>
-        <button class="btn-red" onclick="diagVendor('too_busy')">3. Atendeu / Recusa Preparar</button>
+        <button class="btn-back" onclick="navegar(state.modelo === 'Vendor' ? '2' : '3')">← Voltar</button>
+        <span class="badge badge-food">Food</span>
+        <h2>4. Ligar para a loja</h2>
+        <button class="btn-gray" onclick="diagVendor('nao_atende')">Loja não atende</button>
+        <button class="btn-gray" onclick="diagVendor('pronto')">Atendeu — pedido pronto</button>
+        <button class="btn-red" onclick="diagVendor('too_busy')">Atendeu — recusa preparar</button>
     </div>
 
     <div id="s5" class="step">
-        <button class="back-link" onclick="navegar(state.tipo === 'Food' ? 4 : 1)">← VOLTAR</button>
-        <h2>5. Verificação Rider</h2>
-        
-        <div class="check-box">
-            <label>1. Estafeta assignado?</label>
-            <div class="btn-group">
-                <button id="assign-y" class="btn-gray" onclick="setAns('assign', true)">SIM</button>
-                <button id="assign-n" class="btn-gray" onclick="setAns('assign', false)">NÃO</button>
-            </div>
+        <button class="btn-back" onclick="navegar('4')">← Voltar</button>
+        <span class="badge badge-food">Food</span>
+        <h2>5. Verificação do rider</h2>
+        <div class="checklist">
+            <p class="checklist-title">Marcar o que se aplica</p>
+            <label class="check-item"><input type="checkbox" id="rc-assign"> Estafeta assignado</label>
+            <label class="check-item"><input type="checkbox" id="rc-time"> Aceitou há 20 min ou mais</label>
+            <label class="check-item"><input type="checkbox" id="rc-pickup"> Recolhido (rider já tem o pedido)</label>
+            <label class="check-item"><input type="checkbox" id="rc-stacked"> Não é Stacked Order</label>
         </div>
-
-        <div id="food-extra-checks" style="display: block;">
-            <div class="check-box" id="box-time">
-                <label>2. Aceitou há 20 min ou mais?</label>
-                <div class="btn-group">
-                    <button id="time-y" class="btn-gray" onclick="setAns('time', true)">SIM</button>
-                    <button id="time-n" class="btn-gray" onclick="setAns('time', false)">NÃO</button>
-                </div>
-            </div>
-            <div class="check-box" id="box-pickup">
-                <label>3. RECOLHIDO (Rider já tem o pedido)?</label>
-                <div class="btn-group">
-                    <button id="pickup-y" class="btn-gray" onclick="setAns('pickup', true)">SIM</button>
-                    <button id="pickup-n" class="btn-gray" onclick="setAns('pickup', false)">NÃO</button>
-                </div>
-            </div>
-            <div class="check-box" id="box-stacked">
-                <label>4. NÃO é Stacked Order?</label>
-                <div class="btn-group">
-                    <button id="stacked-y" class="btn-gray" onclick="setAns('stacked', true)">SIM</button>
-                    <button id="stacked-n" class="btn-gray" onclick="setAns('stacked', false)">NÃO</button>
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-navy" onclick="validarFinal()">Validar e Finalizar</button>
+        <button class="btn-navy" onclick="validarRider()">Validar e finalizar</button>
     </div>
 
-    <div id="scancel" class="step">
-        <h2 style="color:red;">Validação de Cancelamento</h2>
-        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; text-align:center; padding:20px; border:2px solid red; border-radius:10px;">
-            BLOQUEADO: Atraso inferior a 40 min.
+    <div id="s-cancel" class="step">
+        <h2 style="color:var(--red)">Validação de cancelamento</h2>
+        <div id="c-block" style="display:none; color:var(--red); font-weight:500; font-size:13px; padding:16px; border:1.5px solid var(--red); border-radius:10px; text-align:center;">
+            Bloqueado — atraso inferior a 40 min.
         </div>
-        <div id="c-ok" style="display:none; text-align:center;">
-            <p style="font-size:13px; font-weight:bold;">Para isenção, verifique se não foi recolhido e se não é stacked.</p>
-            <button class="btn-red" onclick="navegar(5)">Ir para Verificação Final</button>
+        <div id="c-ok" style="display:none;">
+            <div class="checklist">
+                <p class="checklist-title">Verificar se isento</p>
+                <label class="check-item"><input type="checkbox" class="can-check"> Não é Stacked Order</label>
+                <label class="check-item"><input type="checkbox" class="can-check"> Pick-up não aconteceu</label>
+                <label class="check-item"><input type="checkbox" class="can-check"> Atraso 40m+ (ou Q-Com sem rider)</label>
+            </div>
+            <button class="btn-red" onclick="validarRider()">Verificar elegibilidade</button>
         </div>
     </div>
 
-    <div id="sfinal" class="step" style="text-align:center;">
-        <h2>Instrução Final</h2>
-        <div id="f-msg" style="background:#f0f7ff; padding:20px; border-radius:10px; font-weight:bold; color:#004085; margin-bottom:20px; font-size:13px; line-height:1.4;"></div>
-        <button class="btn-navy" onclick="location.reload()">Novo Atendimento</button>
+    <div id="s-final" class="step" style="text-align:center;">
+        <h2>Instrução final</h2>
+        <div id="f-msg" class="result-box result-ok"></div>
+        <button class="btn-navy" onclick="location.reload()">Novo atendimento</button>
     </div>
 </div>
 
 <script>
-    // Ajuste visual para Q-Commerce esconder o que não usa
-    function updateVisibility() {
-        var isFood = (state.tipo === 'Food');
-        document.getElementById('food-extra-checks').style.display = isFood ? 'block' : 'none';
-    }
-    // Sobre-escrever navegar para incluir o ajuste de visibilidade no passo 5
-    var originalNavegar = navegar;
-    navegar = function(n) {
-        originalNavegar(n);
-        if(n == 5) updateVisibility();
-    }
-</script>
-</body>
-</html>
+    var state = { atraso: 0, modelo: '', tipo: 'Food', last: '1' };
+
+    function navegar(n) {
+        document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
+        var target = document.getElementById('s-' + n) || document.getElementB
