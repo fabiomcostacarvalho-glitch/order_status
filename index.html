@@ -3,153 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Expert v13</title>
+    <title>Glovo Expert Guide v14</title>
     <style>
-        /* CSS TOTALMENTE INTERNO - À PROVA DE FALHAS */
+        /* RESET E CORES */
         :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; --gray: #f1f5f9; --green: #22c55e; }
-        body { background: var(--yellow); font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; padding: 40px; margin: 0; color: #1e293b; }
-        .card { background: white; width: 100%; max-width: 480px; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
-        .header { background: var(--navy); color: white; padding: 20px; text-align: center; }
+        body { background: var(--yellow); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        
+        /* CARD PRINCIPAL */
+        .card { background: white; width: 100%; max-width: 480px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; position: relative; z-index: 1; }
+        
+        .header { background: var(--navy); color: white; padding: 25px; text-align: center; }
         .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 20px; text-transform: uppercase; }
-        .progress-bar { background: #eee; height: 16px; width: 100%; }
+        
+        /* PROGRESS BAR FIXA */
+        .progress-container { background: #eee; height: 8px; width: 100%; }
         #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
-        .step { display: none; padding: 25px; min-height: 420px; }
+
+        /* CONTEÚDO */
+        .content { padding: 30px; min-height: 400px; }
+        .step { display: none; }
         .step.active { display: block; }
         
-        button { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
+        /* BOTÕES */
+        button { 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 15px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-bottom: 12px; 
+            text-transform: uppercase; 
+            font-size: 13px; 
+            display: block;
+            position: relative;
+            z-index: 10; /* Garante que o botão está sempre no topo para clique */
+        }
         .btn-navy { background: var(--navy); color: white; }
-        .btn-yellow { background: var(--yellow); color: var(--navy); }
+        .btn-yellow { background: var(--yellow); color: var(--navy); border: 2px solid var(--navy); }
         .btn-gray { background: var(--gray); color: #334155; border: 1px solid #ddd; }
         .btn-red { background: var(--red); color: white; }
-        .btn-back { background: none; color: #888; text-align: left; width: auto; padding: 0; margin-bottom: 15px; font-size: 11px; text-decoration: underline; }
+        .btn-back { background: none; color: #888; text-decoration: underline; font-size: 11px; width: auto; padding: 5px; margin-bottom: 15px; }
 
-        .question-box { background: #f8fafc; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        /* SELEÇÃO SIM/NÃO */
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-small { flex: 1; padding: 12px; font-size: 11px; background: #eee; color: #666; }
-        
-        /* Classes de Seleção */
+        .btn-small { flex: 1; padding: 12px; background: #eee; color: #666; }
         .selected-yes { background: #dcfce7 !important; border: 2px solid var(--green) !important; color: #166534 !important; }
         .selected-no { background: #fee2e2 !important; border: 2px solid var(--red) !important; color: #991b1b !important; }
         
-        .alert { padding: 20px; border-radius: 15px; font-size: 14px; font-weight: bold; line-height: 1.5; border-left: 6px solid #3b82f6; background: #eff6ff; color: #1e40af; margin-top: 20px; }
-        input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        /* INPUTS */
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+        input[type="time"] { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 18px; box-sizing: border-box; }
+
+        /* RESULTADOS */
+        .alert { padding: 20px; border-radius: 15px; font-size: 15px; font-weight: bold; line-height: 1.5; border-left: 6px solid #3b82f6; background: #eff6ff; color: #1e40af; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="header"><h1>Glovo Support Guide</h1></div>
-    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <div class="progress-container"><div id="progress-fill"></div></div>
 
-    <div id="step1" class="step active">
-        <h2>1. Tipo de Pedido</h2>
-        <p style="font-size:13px; color:#666;">Selecione a categoria para as regras de cancelamento:</p>
-        <button class="btn-navy" onclick="setCategory('Food')">🍔 Food (Restaurantes)</button>
-        <button class="btn-navy" onclick="setCategory('QCommerce')">🛍️ Q-Commerce (Lojas/Super)</button>
-    </div>
-
-    <div id="step2" class="step">
-        <button class="btn-back" onclick="navegar(1)">← VOLTAR</button>
-        <h2>2. Calcular Atraso</h2>
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <div style="flex:1;"><label style="font-size:10px; font-weight:bold;">ETA</label><input type="time" id="t-eta"></div>
-            <div style="flex:1;"><label style="font-size:10px; font-weight:bold;">AGORA</label><input type="time" id="t-now"></div>
+    <div class="content">
+        <div id="step1" class="step active">
+            <h2 style="margin-top:0;">1. Tipo de Pedido</h2>
+            <p style="font-size:14px; color:#666; margin-bottom:25px;">Escolha a categoria do pedido:</p>
+            <button class="btn-navy" onclick="setCategory('Food')">🍔 Food (Restaurantes)</button>
+            <button class="btn-navy" onclick="setCategory('QCommerce')">🛍️ Q-Commerce (Lojas/Super)</button>
         </div>
-        <button class="btn-yellow" onclick="calcTime()">Analisar Atraso →</button>
-    </div>
 
-    <div id="step3" class="step">
-        <button class="btn-back" onclick="voltarDeModelo()">← VOLTAR</button>
-        <h2>3. Modelo de Entrega</h2>
-        <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery (Loja entrega)</button>
-        <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery (Glovo entrega)</button>
-    </div>
-
-    <div id="step4" class="step">
-        <button class="btn-back" onclick="navegar(3)">← VOLTAR</button>
-        <h2>4. Contactar Parceiro</h2>
-        <button class="btn-gray" onclick="diagLoja('nao_atende')">A Loja não atendeu</button>
-        <button class="btn-gray" onclick="diagLoja('pronto')">Atendeu / Pedido Pronto</button>
-        <button class="btn-red" onclick="finish('LOJA SATURADA: Realizar cancelamento imediato e comunicar ao cliente.')">Atendeu / Recusa Preparar</button>
-    </div>
-
-    <div id="step5" class="step">
-        <button class="btn-back" onclick="navegar(4)">← VOLTAR</button>
-        <h2>5. Dados do Estafeta</h2>
-        
-        <div class="question-box">
-            <label>1. Tem estafeta atribuído?</label>
-            <div class="btn-group">
-                <button id="q1y" class="btn-small" onclick="ans(1,true)">SIM</button>
-                <button id="q1n" class="btn-small" onclick="ans(1,false)">NÃO</button>
+        <div id="step2" class="step">
+            <button class="btn-back" onclick="navegar(1)">← VOLTAR</button>
+            <h2>2. Calcular Atraso</h2>
+            <div class="input-group">
+                <label>ETA Previsto (App)</label>
+                <input type="time" id="t-eta">
             </div>
-        </div>
-        <div class="question-box">
-            <label>2. O pedido foi recolhido (Pick-up)?</label>
-            <div class="btn-group">
-                <button id="q2y" class="btn-small" onclick="ans(2,true)">SIM</button>
-                <button id="q2n" class="btn-small" onclick="ans(2,false)">NÃO</button>
+            <div class="input-group">
+                <label>Hora Atual (Agora)</label>
+                <input type="time" id="t-now">
             </div>
+            <button class="btn-yellow" onclick="calcTime()">Analisar Atraso →</button>
         </div>
-        <div class="question-box">
-            <label>3. Aceite há 20m+ ou Rider Parado?</label>
-            <div class="btn-group">
-                <button id="q3y" class="btn-small" onclick="ans(3,true)">SIM</button>
-                <button id="q3n" class="btn-small" onclick="ans(3,false)">NÃO</button>
-            </div>
-        </div>
-        <button class="btn-navy" onclick="validarVeredito()" style="margin-top:10px;">Verificar Resultado →</button>
-    </div>
 
-    <div id="step-final" class="step" style="text-align:center;">
-        <h2>Veredito</h2>
-        <div id="f-msg" class="alert"></div>
-        <button class="btn-navy" onclick="location.reload()" style="margin-top:30px;">Novo Atendimento</button>
-    </div>
-
-</div>
-
-<script>
-    var state = { cat: '', atraso: 0, modelo: '', q: [null, null, null, null] };
-
-    function navegar(n) {
-        var steps = document.getElementsByClassName('step');
-        for(var i=0; i<steps.length; i++) steps[i].classList.remove('active');
-        
-        var targetId = (n === 'final') ? 'step-final' : 'step' + n;
-        document.getElementById(targetId).classList.add('active');
-        
-        var progress = (typeof n === 'number') ? (n * 20) : 100;
-        document.getElementById('progress-fill').style.width = progress + '%';
-    }
-
-    function setCategory(c) {
-        state.cat = c;
-        if(c === 'Food') navegar(2);
-        else { state.atraso = 0; navegar(3); }
-    }
-
-    function calcTime() {
-        var t1 = document.getElementById('t-eta').value;
-        var t2 = document.getElementById('t-now').value;
-        if(!t1 || !t2) { alert("Insira os horários!"); return; }
-        
-        var m1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
-        var m2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
-        state.atraso = m2 - m1;
-        navegar(3);
-    }
-
-    function voltarDeModelo() {
-        if(state.cat === 'Food') navegar(2); else navegar(1);
-    }
-
-    function setModelo(m) {
-        state.modelo = m;
-        navegar(4);
-    }
-
-    function diagLoja(tipo) {
-        if(state.modelo === 'Vendor') {
-            if(tipo === 'nao_atende') finish("NEGADO: Parceiro não atendeu. Cliente deve aguardar ou cancelar COM CUSTOS.");
-            else if(tipo === 'pronto') finish("INFORMAR: Parceiro confirmou pronto. Cliente deve aguardar ou
+        <div id="step3" class="step">
+            <button class="btn-back" onclick="voltarDeModelo()">← VOLTAR</button>
+            <h2>3. Modelo de Entrega</h2>
+            <button class="btn-navy" onclick="setModelo('Vendor')">Vendor
