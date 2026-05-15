@@ -5,164 +5,266 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glovo Support Guide v19</title>
     <style>
-        :root { --navy: #000045; --yellow: #FFC244; --red: #E24B4A; --bg: #ffffff; --bg2: #f8fafc; --text: #1a1a2e; --text2: #666; --border: rgba(0,0,0,0.12); }
-        * { box-sizing: border-box; }
-        body { background: var(--yellow); min-height: 100vh; display: flex; justify-content: center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; }
-        .card { background: var(--bg); width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; align-self: flex-start; }
+        :root { --navy: #000045; --yellow: #FFC244; --red: #E24B4A; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--yellow); min-height: 100vh; display: flex; justify-content: center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .card { background: #fff; width: 100%; max-width: 450px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; align-self: flex-start; }
         .header { background: var(--navy); padding: 18px; text-align: center; }
-        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 16px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .header h1 { color: var(--yellow); font-style: italic; font-size: 16px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .prog { background: #ddd; height: 5px; }
-        .prog-fill { background: var(--yellow); height: 100%; transition: width 0.3s; }
+        .prog-fill { background: var(--yellow); height: 100%; transition: width 0.3s; width: 10%; }
         .cancel-bar { background: #fff0f0; padding: 10px 16px; border-bottom: 1px solid #ffd0d0; display: none; justify-content: space-between; align-items: center; }
         .cancel-bar span { color: var(--red); font-size: 11px; font-weight: 700; text-transform: uppercase; }
         .step { display: none; padding: 22px; min-height: 340px; }
         .step.active { display: block; }
-        .step h2 { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 16px; }
-        .step p { font-size: 13px; color: var(--text2); margin: 0 0 14px; line-height: 1.5; }
-        button { width: 100%; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-bottom: 9px; text-transform: uppercase; font-size: 12px; transition: opacity 0.15s; }
+        h2 { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; }
+        p.desc { font-size: 13px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+        button { width: 100%; padding: 13px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; margin-bottom: 9px; text-transform: uppercase; font-size: 12px; }
         button:hover { opacity: 0.85; }
-        .btn-navy { background: var(--navy); color: white; }
+        .btn-navy { background: var(--navy); color: #fff; }
         .btn-yellow { background: var(--yellow); color: var(--navy); }
-        .btn-gray { background: var(--bg2); border: 1px solid var(--border); color: var(--text); }
-        .btn-red { background: var(--red); color: white; }
-        .btn-back { background: none; border: none; color: var(--text2); font-size: 11px; cursor: pointer; padding: 0; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; width: auto; display: block; }
-        input[type="time"] { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 12px; font-size: 15px; background: var(--bg); color: var(--text); }
-        .checklist { background: var(--bg2); padding: 14px; border-radius: 10px; margin-bottom: 14px; }
-        .checklist-title { font-size: 11px; color: var(--text2); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; }
+        .btn-gray { background: #f8fafc; border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-back { background: none; border: none; color: #999; font-size: 11px; cursor: pointer; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; width: auto; display: block; padding: 0; }
+        input[type="time"] { width: 100%; padding: 11px; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 8px; margin-bottom: 12px; font-size: 15px; color: #1a1a2e; }
+        .field-lbl { font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+        .checklist { background: #f8fafc; padding: 14px; border-radius: 10px; margin-bottom: 14px; }
+        .cl-title { font-size: 11px; color: #999; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; font-weight: 500; color: #1a1a2e; cursor: pointer; }
         .check-item:last-child { margin-bottom: 0; }
         .check-item input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--navy); }
         .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-        .badge-qcom { background: #e1f5ee; color: #0f6e56; }
-        .badge-food { background: #faeeda; color: #854f0b; }
-        label.field-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-        .result-box { padding: 18px; border-radius: 10px; font-weight: 500; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
-        .result-ok { background: #eaf3de; color: #3b6d11; border: 1px solid #c0dd97; }
-        .result-warn { background: #faeeda; color: #854f0b; border: 1px solid #fac775; }
-        .result-err { background: #fcebeb; color: #a32d2d; border: 1px solid #f7c1c1; }
+        .bq { background: #e1f5ee; color: #0f6e56; }
+        .bf { background: #faeeda; color: #854f0b; }
+        .result-box { padding: 18px; border-radius: 10px; font-weight: 500; font-size: 13px; line-height: 1.6; margin-bottom: 18px; text-align: left; }
+        .rok  { background: #eaf3de; color: #3b6d11; border: 1px solid #c0dd97; }
+        .rwarn{ background: #faeeda; color: #854f0b; border: 1px solid #fac775; }
+        .rerr { background: #fcebeb; color: #a32d2d; border: 1px solid #f7c1c1; }
+        .blocked { color: var(--red); font-weight: 500; font-size: 13px; padding: 16px; border: 1.5px solid var(--red); border-radius: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="header"><h1>Glovo Support Guide</h1></div>
-    <div class="prog"><div class="prog-fill" id="prog" style="width:10%"></div></div>
+    <div class="prog"><div class="prog-fill" id="prog"></div></div>
 
     <div id="cancelBar" class="cancel-bar">
         <span>O cliente quer cancelar?</span>
-        <input type="checkbox" id="c-check" onchange="toggleCancel()">
+        <input type="checkbox" id="c-check">
     </div>
 
-    <div id="s1" class="step active">
+    <div id="step-1" class="step active">
         <h2>1. Tipo de pedido</h2>
-        <button class="btn-navy" onclick="setTipo('Food')">🍔 Restaurantes (Food)</button>
-        <button class="btn-navy" onclick="setTipo('QCommerce')">🛍️ Q-Commerce (Lojas / Super)</button>
+        <button class="btn-navy" id="btn-food">🍔 Restaurantes (Food)</button>
+        <button class="btn-navy" id="btn-qcom">🛍️ Q-Commerce (Lojas / Super)</button>
     </div>
 
-    <div id="s-qc1" class="step">
-        <button class="btn-back" onclick="navegar('1')">← Voltar</button>
-        <span class="badge badge-qcom">Q-Commerce</span>
+    <div id="step-qc1" class="step">
+        <button class="btn-back" id="back-qc1">← Voltar</button>
+        <span class="badge bq">Q-Commerce</span>
         <h2>O pedido está pronto?</h2>
-        <p>Verifica o status do pedido na app antes de continuar.</p>
-        <button class="btn-navy" onclick="navegar('qc2-pronto')">Sim — pedido pronto</button>
-        <button class="btn-navy" onclick="navegar('qc2-nao')">Não — ainda não está pronto</button>
+        <p class="desc">Verifica o status do pedido na app antes de continuar.</p>
+        <button class="btn-navy" id="btn-qc-sim">Sim — pedido pronto</button>
+        <button class="btn-navy" id="btn-qc-nao">Não — ainda não está pronto</button>
     </div>
 
-    <div id="s-qc2-pronto" class="step">
-        <button class="btn-back" onclick="navegar('qc1')">← Voltar</button>
-        <span class="badge badge-qcom">Q-Commerce</span>
+    <div id="step-qc2a" class="step">
+        <button class="btn-back" id="back-qc2a">← Voltar</button>
+        <span class="badge bq">Q-Commerce</span>
         <h2>Tem estafeta atribuído?</h2>
-        <p>Verifica na app se existe um rider assignado ao pedido.</p>
-        <button class="btn-red" onclick="finalizar('err','CANCELAMENTO COM CUSTOS — Estafeta já atribuído. O cliente será cobrado pelo cancelamento.')">Sim — tem rider</button>
-        <button class="btn-navy" onclick="finalizar('ok','CANCELAMENTO GRATUITO — Sem estafeta atribuído. Proceder com cancelamento sem custos para o cliente.')">Não — sem rider</button>
+        <p class="desc">Verifica na app se existe um rider assignado ao pedido.</p>
+        <button class="btn-red" id="btn-qc-rider-sim">Sim — tem rider</button>
+        <button class="btn-navy" id="btn-qc-rider-nao">Não — sem rider</button>
     </div>
 
-    <div id="s-qc2-nao" class="step">
-        <button class="btn-back" onclick="navegar('qc1')">← Voltar</button>
-        <span class="badge badge-qcom">Q-Commerce</span>
+    <div id="step-qc2b" class="step">
+        <button class="btn-back" id="back-qc2b">← Voltar</button>
+        <span class="badge bq">Q-Commerce</span>
         <h2>Ligar para a loja</h2>
-        <button class="btn-gray" onclick="diagVendor('nao_atende')">Loja não atende</button>
-        <button class="btn-gray" onclick="navegar('qc2-pronto')">Atendeu — pedido pronto agora</button>
-        <button class="btn-red" onclick="diagVendor('too_busy')">Atendeu — recusa preparar</button>
+        <button class="btn-gray" id="btn-qc-natat">Loja não atende</button>
+        <button class="btn-gray" id="btn-qc-prnto">Atendeu — pedido pronto agora</button>
+        <button class="btn-red"  id="btn-qc-recusa">Atendeu — recusa preparar</button>
     </div>
 
-    <div id="s1-5" class="step">
-        <button class="btn-back" onclick="navegar('1')">← Voltar</button>
-        <span class="badge badge-food">Food</span>
+    <div id="step-f1" class="step">
+        <button class="btn-back" id="back-f1">← Voltar</button>
+        <span class="badge bf">Food</span>
         <h2>Cálculo de atraso</h2>
-        <label class="field-label">ETA previsto</label>
+        <label class="field-lbl">ETA previsto</label>
         <input type="time" id="t-eta">
-        <label class="field-label">Hora atual</label>
+        <label class="field-lbl">Hora atual</label>
         <input type="time" id="t-now">
-        <button class="btn-yellow" onclick="calcularAtraso()">Analisar pedido →</button>
+        <button class="btn-yellow" id="btn-calcular">Analisar pedido →</button>
     </div>
 
-    <div id="s2" class="step">
-        <button class="btn-back" onclick="navegar('1-5')">← Voltar</button>
-        <span class="badge badge-food">Food</span>
+    <div id="step-f2" class="step">
+        <button class="btn-back" id="back-f2">← Voltar</button>
+        <span class="badge bf">Food</span>
         <h2>2. Modelo de entrega</h2>
-        <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery</button>
-        <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery</button>
+        <button class="btn-navy" id="btn-vendor">Vendor Delivery</button>
+        <button class="btn-navy" id="btn-platform">Platform Delivery</button>
     </div>
 
-    <div id="s3" class="step">
-        <button class="btn-back" onclick="navegar('2')">← Voltar</button>
-        <span class="badge badge-food">Food</span>
+    <div id="step-f3" class="step">
+        <button class="btn-back" id="back-f3">← Voltar</button>
+        <span class="badge bf">Food</span>
         <h2>3. Status na app</h2>
-        <p>O pedido está marcado como <strong>Pronto</strong> na app?</p>
-        <button class="btn-navy" onclick="navegar('5')">Sim — está pronto</button>
-        <button class="btn-navy" onclick="navegar('4')">Não — ligar para a loja</button>
+        <p class="desc">O pedido está marcado como <strong>Pronto</strong>?</p>
+        <button class="btn-navy" id="btn-f3-sim">Sim — está pronto</button>
+        <button class="btn-navy" id="btn-f3-nao">Não — ligar para a loja</button>
     </div>
 
-    <div id="s4" class="step">
-        <button class="btn-back" onclick="navegar(state.modelo === 'Vendor' ? '2' : '3')">← Voltar</button>
-        <span class="badge badge-food">Food</span>
+    <div id="step-f4" class="step">
+        <button class="btn-back" id="back-f4">← Voltar</button>
+        <span class="badge bf">Food</span>
         <h2>4. Ligar para a loja</h2>
-        <button class="btn-gray" onclick="diagVendor('nao_atende')">Loja não atende</button>
-        <button class="btn-gray" onclick="diagVendor('pronto')">Atendeu — pedido pronto</button>
-        <button class="btn-red" onclick="diagVendor('too_busy')">Atendeu — recusa preparar</button>
+        <button class="btn-gray" id="btn-f4-natat">Loja não atende</button>
+        <button class="btn-gray" id="btn-f4-prnto">Atendeu — pedido pronto</button>
+        <button class="btn-red"  id="btn-f4-recusa">Atendeu — recusa preparar</button>
     </div>
 
-    <div id="s5" class="step">
-        <button class="btn-back" onclick="navegar('4')">← Voltar</button>
-        <span class="badge badge-food">Food</span>
+    <div id="step-f5" class="step">
+        <button class="btn-back" id="back-f5">← Voltar</button>
+        <span class="badge bf">Food</span>
         <h2>5. Verificação do rider</h2>
         <div class="checklist">
-            <p class="checklist-title">Marcar o que se aplica</p>
+            <p class="cl-title">Marcar o que se aplica</p>
             <label class="check-item"><input type="checkbox" id="rc-assign"> Estafeta assignado</label>
             <label class="check-item"><input type="checkbox" id="rc-time"> Aceitou há 20 min ou mais</label>
             <label class="check-item"><input type="checkbox" id="rc-pickup"> Recolhido (rider já tem o pedido)</label>
             <label class="check-item"><input type="checkbox" id="rc-stacked"> Não é Stacked Order</label>
         </div>
-        <button class="btn-navy" onclick="validarRider()">Validar e finalizar</button>
+        <button class="btn-navy" id="btn-validar">Validar e finalizar</button>
     </div>
 
-    <div id="s-cancel" class="step">
+    <div id="step-cancel" class="step">
         <h2 style="color:var(--red)">Validação de cancelamento</h2>
-        <div id="c-block" style="display:none; color:var(--red); font-weight:500; font-size:13px; padding:16px; border:1.5px solid var(--red); border-radius:10px; text-align:center;">
-            Bloqueado — atraso inferior a 40 min.
-        </div>
-        <div id="c-ok" style="display:none;">
+        <div id="c-block" class="blocked" style="display:none">Bloqueado — atraso inferior a 40 min.</div>
+        <div id="c-ok" style="display:none">
             <div class="checklist">
-                <p class="checklist-title">Verificar se isento</p>
-                <label class="check-item"><input type="checkbox" class="can-check"> Não é Stacked Order</label>
-                <label class="check-item"><input type="checkbox" class="can-check"> Pick-up não aconteceu</label>
-                <label class="check-item"><input type="checkbox" class="can-check"> Atraso 40m+ (ou Q-Com sem rider)</label>
+                <p class="cl-title">Verificar se isento</p>
+                <label class="check-item"><input type="checkbox"> Não é Stacked Order</label>
+                <label class="check-item"><input type="checkbox"> Pick-up não aconteceu</label>
+                <label class="check-item"><input type="checkbox"> Atraso 40m+ (ou Q-Com sem rider)</label>
             </div>
-            <button class="btn-red" onclick="validarRider()">Verificar elegibilidade</button>
+            <button class="btn-red" id="btn-cancel-validar">Verificar elegibilidade</button>
         </div>
     </div>
 
-    <div id="s-final" class="step" style="text-align:center;">
+    <div id="step-final" class="step" style="text-align:center">
         <h2>Instrução final</h2>
-        <div id="f-msg" class="result-box result-ok"></div>
-        <button class="btn-navy" onclick="location.reload()">Novo atendimento</button>
+        <div id="f-msg" class="result-box rok"></div>
+        <button class="btn-navy" id="btn-novo">Novo atendimento</button>
     </div>
 </div>
 
 <script>
-    var state = { atraso: 0, modelo: '', tipo: 'Food', last: '1' };
+(function () {
+    var state = { atraso: 0, modelo: '', tipo: '', lastStep: 'step-1' };
+    var prog = document.getElementById('prog');
+    var cancelBar = document.getElementById('cancelBar');
+    var cCheck = document.getElementById('c-check');
 
-    function navegar(n) {
-        document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
-        var target = document.getElementById('s-' + n) || document.getElementB
+    var progMap = {
+        'step-1': 10,
+        'step-qc1': 25, 'step-qc2a': 60, 'step-qc2b': 45,
+        'step-f1': 25, 'step-f2': 42, 'step-f3': 58, 'step-f4': 70, 'step-f5': 85,
+        'step-cancel': 90, 'step-final': 100
+    };
+
+    function go(id) {
+        document.querySelectorAll('.step').forEach(function (s) { s.classList.remove('active'); });
+        document.getElementById(id).classList.add('active');
+        if (id !== 'step-cancel' && id !== 'step-final') state.lastStep = id;
+        prog.style.width = (progMap[id] || 10) + '%';
+    }
+
+    function finalizar(type, msg) {
+        var box = document.getElementById('f-msg');
+        box.textContent = msg;
+        box.className = 'result-box ' + (type === 'ok' ? 'rok' : type === 'warn' ? 'rwarn' : 'rerr');
+        go('step-final');
+    }
+
+    function validarRider() {
+        var assign  = document.getElementById('rc-assign').checked;
+        var time    = document.getElementById('rc-time').checked;
+        var stacked = document.getElementById('rc-stacked').checked;
+        var pickup  = document.getElementById('rc-pickup').checked;
+        if (pickup) {
+            finalizar('warn', 'PEDIDO RECOLHIDO — O estafeta já tem o pedido. Aguardar entrega. Se insistir, cancelar COM CUSTOS.');
+        } else if (state.atraso >= 40) {
+            finalizar('ok', 'ELEGÍVEL — Atraso superior a 40 min e pedido não recolhido. Proceder com cancelamento gratuito.');
+        } else if (assign && time && stacked) {
+            finalizar('ok', 'REATRIBUIÇÃO — Critérios atingidos (Ready, 20m+, não Stacked). Proceder com a troca de estafeta.');
+        } else {
+            finalizar('warn', 'MANTER — Critérios de reatribuição não atingidos. Informar complexidade do pedido.');
+        }
+    }
+
+    document.getElementById('btn-food').onclick = function () { state.tipo = 'Food'; cancelBar.style.display = 'flex'; go('step-f1'); };
+    document.getElementById('btn-qcom').onclick = function () { state.tipo = 'QCommerce'; cancelBar.style.display = 'flex'; go('step-qc1'); };
+
+    document.getElementById('back-qc1').onclick = function () { go('step-1'); };
+    document.getElementById('btn-qc-sim').onclick = function () { go('step-qc2a'); };
+    document.getElementById('btn-qc-nao').onclick = function () { go('step-qc2b'); };
+
+    document.getElementById('back-qc2a').onclick = function () { go('step-qc1'); };
+    document.getElementById('btn-qc-rider-sim').onclick = function () { finalizar('err', 'CANCELAMENTO COM CUSTOS — Estafeta já atribuído. O cliente será cobrado pelo cancelamento.'); };
+    document.getElementById('btn-qc-rider-nao').onclick = function () { finalizar('ok', 'CANCELAMENTO GRATUITO — Sem estafeta atribuído. Proceder com cancelamento sem custos para o cliente.'); };
+
+    document.getElementById('back-qc2b').onclick = function () { go('step-qc1'); };
+    document.getElementById('btn-qc-natat').onclick = function () { finalizar('err', 'NEGADO — Parceiro não atende. Cliente deve aguardar entrega. Se insistir, cancelar COM CUSTOS.'); };
+    document.getElementById('btn-qc-prnto').onclick = function () { go('step-qc2a'); };
+    document.getElementById('btn-qc-recusa').onclick = function () { finalizar('ok', 'LOJA SATURADA — Proceder com cancelamento gratuito e informar o cliente.'); };
+
+    document.getElementById('back-f1').onclick = function () { go('step-1'); };
+    document.getElementById('btn-calcular').onclick = function () {
+        var t1 = document.getElementById('t-eta').value;
+        var t2 = document.getElementById('t-now').value;
+        if (!t1 || !t2) { alert('Preenche as horas!'); return; }
+        var m1 = parseInt(t1.split(':')[0]) * 60 + parseInt(t1.split(':')[1]);
+        var m2 = parseInt(t2.split(':')[0]) * 60 + parseInt(t2.split(':')[1]);
+        state.atraso = m2 - m1;
+        go('step-f2');
+    };
+
+    document.getElementById('back-f2').onclick = function () { go('step-f1'); };
+    document.getElementById('btn-vendor').onclick = function () { state.modelo = 'Vendor'; go('step-f4'); };
+    document.getElementById('btn-platform').onclick = function () { state.modelo = 'Platform'; go('step-f3'); };
+
+    document.getElementById('back-f3').onclick = function () { go('step-f2'); };
+    document.getElementById('btn-f3-sim').onclick = function () { go('step-f5'); };
+    document.getElementById('btn-f3-nao').onclick = function () { go('step-f4'); };
+
+    document.getElementById('back-f4').onclick = function () { go(state.modelo === 'Vendor' ? 'step-f2' : 'step-f3'); };
+    document.getElementById('btn-f4-natat').onclick = function () { finalizar('err', 'NEGADO — Parceiro não atende. Cliente deve aguardar entrega. Se insistir, cancelar COM CUSTOS.'); };
+    document.getElementById('btn-f4-prnto').onclick = function () { go('step-f5'); };
+    document.getElementById('btn-f4-recusa').onclick = function () { finalizar('ok', 'LOJA SATURADA — Proceder com cancelamento gratuito e informar o cliente.'); };
+
+    document.getElementById('back-f5').onclick = function () { go('step-f4'); };
+    document.getElementById('btn-validar').onclick = validarRider;
+
+    cCheck.onchange = function () {
+        if (cCheck.checked) {
+            go('step-cancel');
+            var block = document.getElementById('c-block');
+            var ok = document.getElementById('c-ok');
+            if (state.tipo === 'Food' && state.atraso < 40) {
+                block.style.display = 'block'; ok.style.display = 'none';
+            } else {
+                block.style.display = 'none'; ok.style.display = 'block';
+            }
+        } else {
+            go(state.lastStep);
+        }
+    };
+
+    document.getElementById('btn-cancel-validar').onclick = validarRider;
+    document.getElementById('btn-novo').onclick = function () { location.reload(); };
+})();
+</script>
+
+</body>
+</html>
