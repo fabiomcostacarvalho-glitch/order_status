@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Support Guide v18</title>
+    <title>Glovo Support Guide v19</title>
     <style>
         :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; }
         body { background: var(--yellow); font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -12,23 +12,26 @@
         .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
         .progress-bar { background: #eee; height: 6px; width: 100%; }
         #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
-        .step { display: none; padding: 25px; min-height: 380px; }
+        .step { display: none; padding: 25px; min-height: 400px; }
         .step.active { display: block; }
         .cancel-bar { background: #fff0f0; padding: 12px; border-bottom: 1px solid #ffe0e0; display: none; justify-content: space-between; align-items: center; }
         button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; text-transform: uppercase; font-size: 13px; transition: 0.2s; }
         .btn-yellow { background: var(--yellow); color: var(--navy); font-size: 15px; }
         .btn-navy { background: var(--navy); color: white; }
-        .btn-gray { background: #f1f5f9; border: 1px solid #ddd; }
+        .btn-gray { background: #f1f5f9; border: 1px solid #ddd; color: #333; }
         .btn-red { background: var(--red); color: white; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-group button { flex: 1; }
+        .selected-yes { background: #dcfce7 !important; border: 2px solid #22c55e !important; color: #166534 !important; }
+        .selected-no { background: #fee2e2 !important; border: 2px solid #ef4444 !important; color: #991b1b !important; }
         input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-        .checklist { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .check-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; font-weight: bold; color: var(--navy); cursor: pointer; }
-        .check-item input { width: 18px; height: 18px; cursor: pointer; }
         .back-link { background: none; color: #888; text-align: left; width: auto; padding: 0; margin-bottom: 15px; font-size: 11px; }
+        .check-box { background: #f8fafc; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
+        .check-box label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 10px; color: var(--navy); }
     </style>
 
     <script>
-        var state = { atraso: 0, modelo: '', tipo: 'Food', last: 1 };
+        var state = { atraso: 0, modelo: '', tipo: 'Food', last: 1, q: {} };
 
         function navegar(n) {
             var steps = document.getElementsByClassName('step');
@@ -44,12 +47,18 @@
         function setTipo(t) {
             state.tipo = t;
             if(t === 'QCommerce') {
-                state.atraso = 0; // Tempo não importa em Q-Com
+                state.atraso = 0;
                 document.getElementById('cancelBar').style.display = 'flex';
-                navegar(2);
+                navegar(5); // Vai direto para a verificação de Rider simplificada
             } else {
-                navegar(1.5); // Vai para o cálculo de tempo
+                navegar(1.5);
             }
+        }
+
+        function setAns(id, val) {
+            state.q[id] = val;
+            document.getElementById(id + '-y').className = val ? 'selected-yes' : 'btn-gray';
+            document.getElementById(id + '-n').className = !val ? 'selected-no' : 'btn-gray';
         }
 
         function calcularAtraso() {
@@ -65,8 +74,8 @@
 
         function setModelo(m) {
             state.modelo = m;
-            if(m === 'Vendor') navegar(4); // Ligar loja
-            else navegar(3); // Status App
+            if(m === 'Vendor') navegar(4); 
+            else navegar(3); 
         }
 
         function toggleCancel() {
@@ -75,44 +84,36 @@
                 navegar('cancel');
                 var block = document.getElementById('c-block');
                 var ok = document.getElementById('c-ok');
-                
-                // Regra 40min apenas para Food. QCommerce ignora tempo.
                 if(state.tipo === 'Food' && state.atraso < 40) {
-                    block.style.display = 'block';
-                    ok.style.display = 'none';
+                    block.style.display = 'block'; ok.style.display = 'none';
                 } else {
-                    block.style.display = 'none';
-                    ok.style.display = 'block';
+                    block.style.display = 'none'; ok.style.display = 'block';
                 }
-            } else {
-                navegar(state.last);
-            }
+            } else { navegar(state.last); }
         }
 
         function diagVendor(res) {
-            if(res === 'too_busy') finalizar("✅ LOJA SATURADA: Proceder com o cancelamento gratuito e informar o cliente.");
-            else if(res === 'nao_atende') finalizar("❌ NEGADO: Parceiro não atende. Cliente deve aguardar entrega. Se insistir, cancelar COM CUSTOS (Cliente quer cancelar).");
+            if(res === 'too_busy') finalizar("✅ LOJA SATURADA: Realizar cancelamento imediato e gratuito.");
+            else if(res === 'nao_atende') finalizar("❌ NEGADO: Parceiro não atende. Cliente deve aguardar. Se insistir, cancelar COM CUSTOS.");
             else navegar(5);
         }
 
-        function validarRider() {
-            var assign = document.getElementById('rc-assign').checked;
-            var time = document.getElementById('rc-time').checked;
-            var stacked = document.getElementById('rc-stacked').checked;
-            var pickup = document.getElementById('rc-pickup').checked;
-
+        function validarFinal() {
+            // LÓGICA Q-COMMERCE
             if(state.tipo === 'QCommerce') {
-                if(!assign) finalizar("✅ Q-COMMERCE: Sem estafeta atribuído. CANCELAMENTO GRATUITO permitido.");
-                else finalizar("❌ Q-COMMERCE: Com estafeta atribuído. Cancelamento terá CUSTOS.");
+                if(state.q['assign'] === false) finalizar("✅ Q-COMMERCE: Sem estafeta atribuído. CANCELAMENTO GRATUITO permitido.");
+                else if(state.q['assign'] === true) finalizar("❌ Q-COMMERCE: Com estafeta atribuído. Cancelamento terá CUSTOS.");
+                else alert("Selecione se tem estafeta!");
                 return;
             }
 
-            if(pickup) {
+            // LÓGICA FOOD
+            if(state.q['pickup'] === true) {
                 finalizar("⚠️ PEDIDO RECOLHIDO: O estafeta já tem o pedido. Aguardar entrega. Se insistir, cancelar COM CUSTOS.");
             } else if(state.atraso >= 40) {
                 finalizar("✅ ELEGÍVEL: Atraso > 40min e não recolhido. Proceder com cancelamento gratuito.");
-            } else if(assign && time && stacked) {
-                finalizar("✅ REATRIBUIÇÃO: Critérios atingidos (Ready, 20m+, Direção Errada). Proceder com a troca.");
+            } else if(state.q['assign'] && state.q['time'] && state.q['stacked']) {
+                finalizar("✅ REATRIBUIÇÃO: Critérios atingidos. Proceder com a troca de Rider.");
             } else {
                 finalizar("⚠️ MANTER: Critérios de reatribuição não atingidos. Informar complexidade (Grande/Stacked).");
             }
@@ -136,23 +137,21 @@
     </div>
 
     <div id="s1" class="step active">
-        <h2 style="font-size:18px;">1. Tipo de Pedido</h2>
+        <h2>1. Tipo de Pedido</h2>
         <button class="btn-navy" onclick="setTipo('Food')">🍔 Food (Restaurantes)</button>
         <button class="btn-navy" onclick="setTipo('QCommerce')">🛍️ Q-Commerce (Lojas/Super)</button>
     </div>
 
     <div id="s1.5" class="step">
         <button class="back-link" onclick="navegar(1)">← VOLTAR</button>
-        <h2>Cálculo de Atraso</h2>
-        <label>ETA PREVISTO</label>
-        <input type="time" id="t-eta">
-        <label>HORA ATUAL</label>
-        <input type="time" id="t-now">
-        <button class="btn-yellow" onclick="calcularAtraso()">Analisar Pedido →</button>
+        <h2>Cálculo de Atraso (Food)</h2>
+        <label>ETA PREVISTO</label><input type="time" id="t-eta">
+        <label>HORA ATUAL</label><input type="time" id="t-now">
+        <button class="btn-yellow" onclick="calcularAtraso()">Analisar →</button>
     </div>
 
     <div id="s2" class="step">
-        <button class="back-link" onclick="navegar(state.tipo === 'Food' ? 1.5 : 1)">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(1.5)">← VOLTAR</button>
         <h2>2. Modelo de Entrega</h2>
         <button class="btn-navy" onclick="setModelo('Vendor')">Vendor Delivery</button>
         <button class="btn-navy" onclick="setModelo('Platform')">Platform Delivery</button>
@@ -175,30 +174,52 @@
     </div>
 
     <div id="s5" class="step">
-        <button class="back-link" onclick="navegar(4)">← VOLTAR</button>
+        <button class="back-link" onclick="navegar(state.tipo === 'Food' ? 4 : 1)">← VOLTAR</button>
         <h2>5. Verificação Rider</h2>
-        <div class="checklist">
-            <label class="check-item"><input type="checkbox" id="rc-assign"> Estafeta assignado</label>
-            <label class="check-item"><input type="checkbox" id="rc-time"> Aceitou há 20 min ou mais</label>
-            <label class="check-item"><input type="checkbox" id="rc-pickup"> RECOLHIDO (Rider já tem o pedido)</label>
-            <label class="check-item"><input type="checkbox" id="rc-stacked"> NÃO é Stacked Order</label>
+        
+        <div class="check-box">
+            <label>1. Estafeta assignado?</label>
+            <div class="btn-group">
+                <button id="assign-y" class="btn-gray" onclick="setAns('assign', true)">SIM</button>
+                <button id="assign-n" class="btn-gray" onclick="setAns('assign', false)">NÃO</button>
+            </div>
         </div>
-        <button class="btn-navy" onclick="validarRider()">Validar e Finalizar</button>
+
+        <div id="food-extra-checks" style="display: block;">
+            <div class="check-box" id="box-time">
+                <label>2. Aceitou há 20 min ou mais?</label>
+                <div class="btn-group">
+                    <button id="time-y" class="btn-gray" onclick="setAns('time', true)">SIM</button>
+                    <button id="time-n" class="btn-gray" onclick="setAns('time', false)">NÃO</button>
+                </div>
+            </div>
+            <div class="check-box" id="box-pickup">
+                <label>3. RECOLHIDO (Rider já tem o pedido)?</label>
+                <div class="btn-group">
+                    <button id="pickup-y" class="btn-gray" onclick="setAns('pickup', true)">SIM</button>
+                    <button id="pickup-n" class="btn-gray" onclick="setAns('pickup', false)">NÃO</button>
+                </div>
+            </div>
+            <div class="check-box" id="box-stacked">
+                <label>4. NÃO é Stacked Order?</label>
+                <div class="btn-group">
+                    <button id="stacked-y" class="btn-gray" onclick="setAns('stacked', true)">SIM</button>
+                    <button id="stacked-n" class="btn-gray" onclick="setAns('stacked', false)">NÃO</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-navy" onclick="validarFinal()">Validar e Finalizar</button>
     </div>
 
     <div id="scancel" class="step">
-        <h2 style="color:red;">Validação</h2>
-        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; padding:20px; border:2px solid red; border-radius:10px; text-align:center;">
+        <h2 style="color:red;">Validação de Cancelamento</h2>
+        <div id="c-block" style="display:none; color:red; font-weight:bold; font-size:13px; text-align:center; padding:20px; border:2px solid red; border-radius:10px;">
             BLOQUEADO: Atraso inferior a 40 min.
         </div>
-        <div id="c-ok" style="display:none;">
-            <div class="checklist">
-                <p style="font-size:11px; margin-bottom:10px;">Verificar se Isento:</p>
-                <label class="check-item"><input type="checkbox" class="can-check"> Não é Stacked Order</label>
-                <label class="check-item"><input type="checkbox" class="can-check"> Pick-up NÃO aconteceu</label>
-                <label class="check-item"><input type="checkbox" class="can-check"> Atraso 40m+ (ou Q-Com sem Rider)</label>
-            </div>
-            <button class="btn-red" onclick="validarRider()">Verificar Elegibilidade</button>
+        <div id="c-ok" style="display:none; text-align:center;">
+            <p style="font-size:13px; font-weight:bold;">Para isenção, verifique se não foi recolhido e se não é stacked.</p>
+            <button class="btn-red" onclick="navegar(5)">Ir para Verificação Final</button>
         </div>
     </div>
 
@@ -207,8 +228,20 @@
         <div id="f-msg" style="background:#f0f7ff; padding:20px; border-radius:10px; font-weight:bold; color:#004085; margin-bottom:20px; font-size:13px; line-height:1.4;"></div>
         <button class="btn-navy" onclick="location.reload()">Novo Atendimento</button>
     </div>
-
 </div>
 
+<script>
+    // Ajuste visual para Q-Commerce esconder o que não usa
+    function updateVisibility() {
+        var isFood = (state.tipo === 'Food');
+        document.getElementById('food-extra-checks').style.display = isFood ? 'block' : 'none';
+    }
+    // Sobre-escrever navegar para incluir o ajuste de visibilidade no passo 5
+    var originalNavegar = navegar;
+    navegar = function(n) {
+        originalNavegar(n);
+        if(n == 5) updateVisibility();
+    }
+</script>
 </body>
 </html>
