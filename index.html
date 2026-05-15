@@ -3,92 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glovo Expert Guide v14</title>
+    <title>Glovo Support Guide v15</title>
     <style>
-        /* RESET E CORES */
-        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; --gray: #f1f5f9; --green: #22c55e; }
-        body { background: var(--yellow); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        :root { --navy: #000045; --yellow: #FFC244; --red: #FF4444; --gray: #f8fafc; }
+        body { background: var(--yellow); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 25px; box-sizing: border-box; }
+        .header { background: var(--navy); color: white; padding: 15px; text-align: center; border-radius: 15px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 18px; text-transform: uppercase; }
         
-        /* CARD PRINCIPAL */
-        .card { background: white; width: 100%; max-width: 480px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; position: relative; z-index: 1; }
+        .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        h2 { font-size: 14px; text-transform: uppercase; margin-bottom: 10px; color: var(--navy); }
         
-        .header { background: var(--navy); color: white; padding: 25px; text-align: center; }
-        .header h1 { margin: 0; color: var(--yellow); font-style: italic; font-size: 20px; text-transform: uppercase; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; }
+        select, input[type="time"] { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
         
-        /* PROGRESS BAR FIXA */
-        .progress-container { background: #eee; height: 8px; width: 100%; }
-        #progress-fill { background: var(--yellow); height: 100%; width: 20%; transition: 0.3s; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-opt { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #ddd; background: #fff; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-opt.active { background: var(--navy); color: white; border-color: var(--navy); }
 
-        /* CONTEÚDO */
-        .content { padding: 30px; min-height: 400px; }
-        .step { display: none; }
-        .step.active { display: block; }
+        #veredito { margin-top: 25px; padding: 20px; border-radius: 15px; background: #eff6ff; border-left: 6px solid #3b82f6; display: none; }
+        #veredito h3 { margin: 0 0 10px 0; font-size: 16px; color: #1e40af; text-transform: uppercase; }
+        #msg-final { font-size: 14px; font-weight: bold; line-height: 1.5; color: #1e3a8a; }
         
-        /* BOTÕES */
-        button { 
-            width: 100%; 
-            padding: 18px; 
-            border-radius: 15px; 
-            border: none; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-bottom: 12px; 
-            text-transform: uppercase; 
-            font-size: 13px; 
-            display: block;
-            position: relative;
-            z-index: 10; /* Garante que o botão está sempre no topo para clique */
-        }
-        .btn-navy { background: var(--navy); color: white; }
-        .btn-yellow { background: var(--yellow); color: var(--navy); border: 2px solid var(--navy); }
-        .btn-gray { background: var(--gray); color: #334155; border: 1px solid #ddd; }
-        .btn-red { background: var(--red); color: white; }
-        .btn-back { background: none; color: #888; text-decoration: underline; font-size: 11px; width: auto; padding: 5px; margin-bottom: 15px; }
-
-        /* SELEÇÃO SIM/NÃO */
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-small { flex: 1; padding: 12px; background: #eee; color: #666; }
-        .selected-yes { background: #dcfce7 !important; border: 2px solid var(--green) !important; color: #166534 !important; }
-        .selected-no { background: #fee2e2 !important; border: 2px solid var(--red) !important; color: #991b1b !important; }
-        
-        /* INPUTS */
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        input[type="time"] { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 18px; box-sizing: border-box; }
-
-        /* RESULTADOS */
-        .alert { padding: 20px; border-radius: 15px; font-size: 15px; font-weight: bold; line-height: 1.5; border-left: 6px solid #3b82f6; background: #eff6ff; color: #1e40af; }
+        .btn-reset { width: 100%; padding: 15px; background: var(--navy); color: white; border: none; border-radius: 10px; margin-top: 20px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="header"><h1>Glovo Support Guide</h1></div>
-    <div class="progress-container"><div id="progress-fill"></div></div>
 
-    <div class="content">
-        <div id="step1" class="step active">
-            <h2 style="margin-top:0;">1. Tipo de Pedido</h2>
-            <p style="font-size:14px; color:#666; margin-bottom:25px;">Escolha a categoria do pedido:</p>
-            <button class="btn-navy" onclick="setCategory('Food')">🍔 Food (Restaurantes)</button>
-            <button class="btn-navy" onclick="setCategory('QCommerce')">🛍️ Q-Commerce (Lojas/Super)</button>
+    <div class="section">
+        <h2>1. Tipo de Pedido e Atraso</h2>
+        <select id="cat" onchange="atualizar()">
+            <option value="Food">🍔 Food (Restaurantes)</option>
+            <option value="QCommerce">🛍️ Q-Commerce</option>
+        </select>
+        <div id="time-group" style="display: flex; gap: 10px;">
+            <div style="flex:1;"><label>ETA</label><input type="time" id="t-eta" onchange="atualizar()"></div>
+            <div style="flex:1;"><label>AGORA</label><input type="time" id="t-now" onchange="atualizar()"></div>
         </div>
+    </div>
 
-        <div id="step2" class="step">
-            <button class="btn-back" onclick="navegar(1)">← VOLTAR</button>
-            <h2>2. Calcular Atraso</h2>
-            <div class="input-group">
-                <label>ETA Previsto (App)</label>
-                <input type="time" id="t-eta">
-            </div>
-            <div class="input-group">
-                <label>Hora Atual (Agora)</label>
-                <input type="time" id="t-now">
-            </div>
-            <button class="btn-yellow" onclick="calcTime()">Analisar Atraso →</button>
+    <div class="section">
+        <h2>2. Modelo e Contacto Loja</h2>
+        <div class="btn-group">
+            <button class="btn-opt" id="m-vendor" onclick="setM('Vendor')">Vendor</button>
+            <button class="btn-opt" id="m-platform" onclick="setM('Platform')">Platform</button>
         </div>
+        <p style="font-size:10px; font-weight:bold; color:#888; margin: 10px 0 5px 0;">STATUS DA CHAMADA NA LOJA:</p>
+        <div class="btn-group">
+            <button class="btn-opt" id="l-nao" onclick="setL('nao_atende')">Não Atende</button>
+            <button class="btn-opt" id="l-pronto" onclick="setL('pronto')">Pronto</button>
+            <button class="btn-opt" id="l-recusa" onclick="setL('recusa')">Recusa</button>
+        </div>
+    </div>
 
-        <div id="step3" class="step">
-            <button class="btn-back" onclick="voltarDeModelo()">← VOLTAR</button>
-            <h2>3. Modelo de Entrega</h2>
-            <button class="btn-navy" onclick="setModelo('Vendor')">Vendor
+    <div id="rider-section" class="section" style="display:none;">
+        <h2>3. Dados do Rider (Platform)</h2>
+        <label>1. Tem estafeta atribuído?</label>
+        <div class="btn-group mb-2">
+            <button class="btn-opt" id="q1y" onclick="setQ(1,true)">SIM</button>
+            <button class="btn-opt" id="q1n" onclick="setQ(1,false)">NÃO</button>
+        </div>
+        <label style="margin-top:10px;">2. Foi recolhido (Pick-up)?</label>
+        <div class="btn-group">
+            <button class="btn-opt" id="q2y" onclick="setQ(2,true)">SIM</button>
+            <button class="btn-opt" id="q2n" onclick="setQ(2,false)">NÃO</button>
+        </div>
+        <label style="margin-top:10px;">3. Aceite há 20m+ / Rider Parado?</label>
+        <div class="btn-group">
+            <button class="btn-opt" id="q3y" onclick="setQ(3,true)">SIM</button>
+            <button class="btn-opt" id="q3n" onclick="setQ(3,false)">NÃO</button>
+        </div>
+    </div>
+
+    <div id="veredito">
+        <h3>Resultado Recomendado:</h3>
+        <div id="msg-final"></div>
+        <button class="btn-reset" onclick="location.reload()">Limpar / Novo Caso</button>
+    </div>
+</div>
+
+<script>
+    var s = { cat: 'Food', m: '', l: '', q1: null, q2: null, q3: null };
+
+    function setM(val) { 
+        s.m = val; 
+        document.getElementById('m-vendor').className = val == 'Vendor' ? 'btn-opt active' : 'btn-opt';
+        document.getElementById('m-platform').className = val == 'Platform' ? 'btn-opt active' : 'btn-opt';
+        document.getElementById('rider-section').style.display = val == 'Platform' ? 'block' : 'none';
+        atualizar(); 
+    }
+    function setL(val) { 
+        s.l = val; 
+        document.getElementById('l-nao').className = val == 'nao_atende' ? 'btn-opt active' : 'btn-opt';
+        document.getElementById('l-pronto').className = val == 'pronto' ? 'btn-opt active' : 'btn-opt';
+        document.getElementById('l-recusa').className = val == 'recusa' ? 'btn-opt active' : 'btn-opt';
+        atualizar(); 
+    }
+    function setQ(n, val) { 
+        s['q'+n] = val; 
+        document.getElementById('q'+n+'y').className = val ? 'btn-opt active' : 'btn-opt';
+        document.getElementById('q'+n+'n').className = !val ? 'btn-opt active' : 'btn-opt';
+        atualizar(); 
+    }
+
+    function atualizar() {
+        s.cat = document.getElementById('cat').value;
+        document.getElementById('time-group').style.display = s.cat == 'Food' ? 'flex' : 'none';
+        
+        var msg = "";
+        var t1 = document.getElementById('t-eta').value;
+        var t2 = document.getElementById('t-now').value;
+        var atraso = 0;
+        if(t1 && t2) atraso = (parseInt(t2.split(':')[0])*60+parseInt(t2.split(':')[1])) - (parseInt(t1.split(':')[0])*60+parseInt(t1.split(':')[1]));
+
+        if(!s.m || !s.l) return;
+
+        // 1. LOJA RECUSA
+        if(s.l == 'recusa') msg = "LOJA SATURADA: Realizar cancelamento imediato e compensar o cliente.";
+        
+        // 2. VENDOR
+        else if(s.m == 'Vendor') {
+            if(s.l == 'nao_atende') msg = "PARCEIRO NÃO ATENDE: Negar cancelamento. Cliente deve aguardar ou cancelar COM CUSTOS.";
+            else msg = "VENDOR PRONTO: Parceiro confirmou entrega em curso. Aguardar ou cancelar COM CUSTOS.";
+        }
+        
+        // 3. PLATFORM
+        else if(s.m == 'Platform') {
+            if(s.q1 === null || s.q2 === null) msg = "A aguardar dados do Rider (Pergunta 1 e 2)...";
+            else if(s.cat == 'QCommerce') {
+                msg = !s.q1 ? "Q-COMMERCE: Sem estafeta. CANCELAMENTO GRATUITO permitido." : "Q-COMMERCE: Com estafeta. Cancelamento COM CUSTOS.";
+            } else {
+                if(atraso >= 40 && !s.q2) msg = "FOOD: Atraso > 40min e não recolhido. CANCELAMENTO GRATUITO permitido.";
+                else if(s.q1 && s.q3 && !s.q2) msg = "REATRIBUIÇÃO: Rider parado/atrasado. Proceder com a troca de estafeta.";
+                else msg = "MANTER: Informar cliente que o pedido está em curso. Se insistir, cancelamento COM CUSTOS.";
+            }
+        }
+
+        if(msg) {
+            document.getElementById('veredito').style.display = 'block';
+            document.getElementById('msg-final').innerText = msg;
+        }
+    }
+</script>
+
+</body>
+</html>
